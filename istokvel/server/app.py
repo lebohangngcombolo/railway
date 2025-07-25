@@ -108,9 +108,9 @@ logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 # -------------------- CORS --------------------
-CORS(app, origins="http://localhost:5173", supports_credentials=True)
-CORS(app, resources={r"/api/*": {"origins": "http://localhost:5173"}}, supports_credentials=True)
-CORS(app, resources={r"/admin/*": {"origins": "http://localhost:5173"}}, supports_credentials=True)
+CORS(app, origins="https://railway-9odz.onrender.com", supports_credentials=True)
+CORS(app, resources={r"/api/*": {"origins": "https://railway-9odz.onrender.com"}}, supports_credentials=True)
+CORS(app, resources={r"/admin/*": {"origins": "https://railway-9odz.onrender.com"}}, supports_credentials=True)
 
 # -------------------- UTILITY FUNCTIONS --------------------
 def generate_otp():
@@ -4462,7 +4462,7 @@ def send_message(current_user):
                 "HTTP-Referer": os.getenv('FRONTEND_URL', 'http://localhost:3000'),
                 "X-Title": "Stokvel Assistant",
             },
-            model="meta-llama/llama-3-8b-instruct",
+            model="deepseek/deepseek-chat-v3-0324:free",
             messages=messages,
             max_tokens=150
         )
