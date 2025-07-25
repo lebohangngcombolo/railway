@@ -25,7 +25,7 @@ dist-ssr
 
 *.pyc
 __pycache__/
-.env.example
+.env
 venv/
 .venv/
 iStokvel/

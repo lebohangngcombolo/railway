@@ -1,3 +1,5 @@
+// src/pages/PartnerPortal.tsx
+
 import React, { useState } from "react";
 
 const PARTNERS = [

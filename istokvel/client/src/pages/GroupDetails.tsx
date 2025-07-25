@@ -13,7 +13,6 @@ const GroupDetails: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [contributionAmount, setContributionAmount] = useState<number | null>(null);
   const [paymentMethod, setPaymentMethod] = useState<"wallet" | "bank">("wallet");
-  const [contributing, setContributing] = useState(false);
   const [contributionStatus, setContributionStatus] = useState<string | null>(null);
   const [walletBalance, setWalletBalance] = useState<number>(0);
   const [cards, setCards] = useState<any[]>([]);
@@ -27,7 +26,6 @@ const GroupDetails: React.FC = () => {
     const fetchGroup = async () => {
       setLoading(true);
       try {
-        const token = localStorage.getItem("token");
         const groupRes = await api.get(`/api/admin/groups/${groupId}`);
         setGroup(groupRes.data);
 

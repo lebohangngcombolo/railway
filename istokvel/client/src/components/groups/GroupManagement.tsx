@@ -2,46 +2,6 @@
 import React, { useState } from 'react';
 import { groupService, GroupData } from '../../services/groupService';
 
-const tierDetails: Record<string, Record<string, {
-  amountRange: string;
-  interest: string;
-  access: string;
-  description: string;
-  support: string;
-}>> = {
-  Savings: {
-    Bronze: {
-      amountRange: "R200–R450",
-      interest: "2.5% p.a.",
-      access: "Anytime",
-      description: "Perfect for individuals or small groups starting their savings journey. Flexible deposits and easy withdrawals.",
-      support: "Basic support"
-    },
-    Silver: {
-      amountRange: "R500–R950",
-      interest: "3.2% p.a.",
-      access: "Anytime",
-      description: "Ideal for growing savings groups looking for better rates and more flexibility.",
-      support: "Priority support"
-    },
-    Gold: {
-      amountRange: "R1000–R1950",
-      interest: "4.1% p.a.",
-      access: "Anytime",
-      description: "Best for established groups wanting higher limits and added perks.",
-      support: "Premium support"
-    },
-    Platinum: {
-      amountRange: "R2000+",
-      interest: "5.0% p.a.",
-      access: "Anytime",
-      description: "Premium tier for large groups seeking maximum benefits and exclusive features.",
-      support: "24/7 VIP support"
-    }
-  },
-  // ... (add other categories as needed, same as in previous examples)
-};
-
 export const GroupManagement: React.FC = () => {
   // State for create group form
   const [createFormData, setCreateFormData] = useState<GroupData>({
@@ -94,7 +54,7 @@ export const GroupManagement: React.FC = () => {
 
   const handleJoin = async () => {
     try {
-      await groupService.joinGroup(joinGroupCode);
+      await groupService.joinGroup(Number(joinGroupCode));
       setJoinSuccess('Successfully joined the group!');
       setGroupDetails(null);
       setJoinGroupCode('');

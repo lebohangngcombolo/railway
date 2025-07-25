@@ -101,7 +101,7 @@ const MarketplacePurchase: React.FC = () => {
                 required
               >
                 <option value="">Select</option>
-                {PROVIDERS[itemType].map((prov) => (
+                {PROVIDERS[itemType as keyof typeof PROVIDERS].map((prov: string) => (
                   <option key={prov} value={prov}>{prov}</option>
                 ))}
               </select>

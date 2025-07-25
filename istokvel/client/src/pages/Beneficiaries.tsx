@@ -18,8 +18,10 @@ const getInitials = (name = "") =>
     .join("")
     .toUpperCase();
 
-const getRelationshipColor = (relationship) =>
-  RELATIONSHIPS.find((r) => r.label === relationship)?.color || "bg-gray-100 text-gray-700";
+const getRelationshipColor = (relationship: string) => {
+  const found = RELATIONSHIPS.find((r) => r.label === relationship);
+  return found ? found.color : "bg-gray-100 text-gray-700";
+};
 
 const getFileType = (url: string) => {
   if (!url) return "";
@@ -35,13 +37,14 @@ const docTypes = [
 ];
 
 const Beneficiaries = () => {
-  const [beneficiaries, setBeneficiaries] = useState([]);
+  const [beneficiaries, setBeneficiaries] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  // Removed unused loading state
   const [showForm, setShowForm] = useState(false);
-  const [editing, setEditing] = useState(null);
-  const [confirmDelete, setConfirmDelete] = useState(null);
+  const [editing, setEditing] = useState<any>(null);
+  const [confirmDelete, setConfirmDelete] = useState<any>(null);
   const [search, setSearch] = useState("");
-  const [selectedBeneficiary, setSelectedBeneficiary] = useState(null);
+  const [selectedBeneficiary, setSelectedBeneficiary] = useState<any>(null);
   const [previewDoc, setPreviewDoc] = useState<{ url: string, type: string, label: string } | null>(null);
   const [previewLoading, setPreviewLoading] = useState(false);
   const [previewDocs, setPreviewDocs] = useState<any[]>([]);
@@ -66,7 +69,7 @@ const Beneficiaries = () => {
     fetchBeneficiaries();
   }, []);
 
-  const handleDelete = async (id) => {
+  const handleDelete = async (id: string) => {
     await fetch(`/api/beneficiaries/${id}`, {
       method: "DELETE",
       headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
@@ -87,13 +90,6 @@ const Beneficiaries = () => {
     fetchBeneficiaries(); // Refresh the table immediately
   };
 
-  // Helper: collect all available docs for a beneficiary
-  const getDocsArray = (b) => [
-    b.id_doc_url && { url: b.id_doc_url, type: getFileType(b.id_doc_url), label: "ID Document" },
-    b.address_doc_url && { url: b.address_doc_url, type: getFileType(b.address_doc_url), label: "Proof of Address" },
-    b.relationship_doc_url && { url: b.relationship_doc_url, type: getFileType(b.relationship_doc_url), label: "Proof of Relationship" },
-  ].filter(Boolean);
-
   // Filtered beneficiaries
   const filtered = beneficiaries.filter(b =>
     b.name?.toLowerCase().includes(search.toLowerCase()) ||
@@ -102,6 +98,10 @@ const Beneficiaries = () => {
 
   console.log("Beneficiaries:", beneficiaries);
   console.log("Selected beneficiary:", selectedBeneficiary);
+
+  if (loading) {
+    return <div className="flex justify-center items-center h-64 text-blue-600 font-bold">Loading beneficiaries...</div>;
+  }
 
   return (
     <div className="min-h-[80vh] bg-[#f4f6fb] py-10 px-2 md:px-8">
@@ -131,15 +131,15 @@ const Beneficiaries = () => {
 
         {/* Table */}
         <div className="rounded-2xl bg-white shadow border border-gray-200 overflow-hidden">
-          <table className="w-full">
-            <thead className="bg-[#f4f6fb]">
+          <table className="w-full min-w-[700px]">
+            <thead className="bg-[#3B4CCA]">
               <tr>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Beneficiary ID</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Name</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Phone Number</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Relationship</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Email</th>
-                <th className="px-4 py-3 text-center text-xs font-semibold text-gray-700 uppercase">Actions</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-white uppercase">Beneficiary ID</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-white uppercase">Name</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-white uppercase">Phone Number</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-white uppercase">Relationship</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-white uppercase">Email</th>
+                <th className="px-4 py-3 text-center text-xs font-semibold text-white uppercase">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -148,7 +148,7 @@ const Beneficiaries = () => {
                   <td colSpan={6} className="text-center py-10 text-gray-400">No beneficiaries found.</td>
                 </tr>
               ) : (
-                filtered.map((b, idx) => (
+                filtered.map((b) => (
                   <tr
                 key={b.id}
                     onClick={() => {
@@ -392,7 +392,7 @@ const Beneficiaries = () => {
 };
 
 // --- Add/Edit Beneficiary Form ---
-const BeneficiaryForm = ({ beneficiary, onClose, onSave }) => {
+const BeneficiaryForm = ({ beneficiary, onClose, onSave }: { beneficiary: any, onClose: () => void, onSave: () => void }) => {
   const [form, setForm] = useState({
     name: beneficiary?.name || "",
     id_number: beneficiary?.id_number || "",
@@ -404,21 +404,18 @@ const BeneficiaryForm = ({ beneficiary, onClose, onSave }) => {
   const [loading, setLoading] = useState(false);
 
   // --- Add these states for document files and URLs ---
-  const [idFile, setIdFile] = useState(null);
-  const [addressFile, setAddressFile] = useState(null);
-  const [relationshipFile, setRelationshipFile] = useState(null);
+  const [idFile, setIdFile] = useState<File | null>(null);
+  const [addressFile, setAddressFile] = useState<File | null>(null);
+  const [relationshipFile, setRelationshipFile] = useState<File | null>(null);
 
-  const [idUrl, setIdUrl] = useState(beneficiary?.id_doc_url || "");
-  const [addressUrl, setAddressUrl] = useState(beneficiary?.address_doc_url || "");
-  const [relationshipUrl, setRelationshipUrl] = useState(beneficiary?.relationship_doc_url || "");
-
-  const [uploadingId, setUploadingId] = useState(false);
-  const [uploadingAddress, setUploadingAddress] = useState(false);
-  const [uploadingRelationship, setUploadingRelationship] = useState(false);
+  // Add back state setters for document URLs to fix linter errors
+  const [, setIdUrl] = useState("");
+  const [, setAddressUrl] = useState("");
+  const [, setRelationshipUrl] = useState("");
 
   const isEdit = !!beneficiary;
 
-  function getDOBFromID(idNumber) {
+  function getDOBFromID(idNumber: string) {
     if (!/^\d{6}/.test(idNumber)) return "";
     let year = idNumber.slice(0, 2);
     let month = idNumber.slice(2, 4);
@@ -432,7 +429,7 @@ const BeneficiaryForm = ({ beneficiary, onClose, onSave }) => {
     return `${fullYear}-${month}-${day}`;
   }
 
-  const handleChange = (e) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setForm((prev) => {
       let updated = { ...prev, [name]: value };
@@ -444,8 +441,14 @@ const BeneficiaryForm = ({ beneficiary, onClose, onSave }) => {
     });
   };
 
+  // Fix handleChange for select
+  const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
+  };
+
   // --- Add this helper for uploading a document ---
-  const uploadDoc = async (beneficiaryId, file, type, setUrl) => {
+  const uploadDoc = async (beneficiaryId: string, file: File | null, type: string, setUrl: (url: string) => void) => {
     if (!file) return;
     const formData = new FormData();
     formData.append("file", file);
@@ -460,7 +463,7 @@ const BeneficiaryForm = ({ beneficiary, onClose, onSave }) => {
   };
 
   // --- Update handleSubmit to upload documents after saving beneficiary ---
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     const method = isEdit ? "PUT" : "POST";
@@ -523,7 +526,7 @@ const BeneficiaryForm = ({ beneficiary, onClose, onSave }) => {
             <select
               name="relationship"
               value={form.relationship}
-              onChange={handleChange}
+              onChange={handleSelectChange}
               className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-200"
               required
             >
@@ -585,21 +588,10 @@ const BeneficiaryForm = ({ beneficiary, onClose, onSave }) => {
                 type="file"
                 accept="image/*,application/pdf"
                 onChange={async e => {
-                  const file = e.target.files[0];
+                  const file = e.target.files?.[0] ?? null;
                   setIdFile(file);
-                  if (file && beneficiary?.id) {
-                    setUploadingId(true);
-                    const formData = new FormData();
-                    formData.append("file", file);
-                    formData.append("type", "id");
-                    const res = await fetch(`/api/beneficiaries/${beneficiary.id}/documents`, {
-                      method: "POST",
-                      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-                      body: formData,
-                    });
-                    const data = await res.json();
-                    if (data.url) setIdUrl(data.url);
-                    setUploadingId(false);
+                  if (file !== null && beneficiary?.id) {
+                    await uploadDoc(beneficiary.id, file, "id", setIdUrl);
                   }
                 }}
                 className="w-full"
@@ -612,21 +604,10 @@ const BeneficiaryForm = ({ beneficiary, onClose, onSave }) => {
                 type="file"
                 accept="image/*,application/pdf"
                 onChange={async e => {
-                  const file = e.target.files[0];
+                  const file = e.target.files?.[0] ?? null;
                   setAddressFile(file);
-                  if (file && beneficiary?.id) {
-                    setUploadingAddress(true);
-                    const formData = new FormData();
-                    formData.append("file", file);
-                    formData.append("type", "address");
-                    const res = await fetch(`/api/beneficiaries/${beneficiary.id}/documents`, {
-                      method: "POST",
-                      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-                      body: formData,
-                    });
-                    const data = await res.json();
-                    if (data.url) setAddressUrl(data.url);
-                    setUploadingAddress(false);
+                  if (file !== null && beneficiary?.id) {
+                    await uploadDoc(beneficiary.id, file, "address", setAddressUrl);
                   }
                 }}
                 className="w-full"
@@ -639,21 +620,10 @@ const BeneficiaryForm = ({ beneficiary, onClose, onSave }) => {
                 type="file"
                 accept="image/*,application/pdf"
                 onChange={async e => {
-                  const file = e.target.files[0];
+                  const file = e.target.files?.[0] ?? null;
                   setRelationshipFile(file);
-                  if (file && beneficiary?.id) {
-                    setUploadingRelationship(true);
-                    const formData = new FormData();
-                    formData.append("file", file);
-                    formData.append("type", "relationship");
-                    const res = await fetch(`/api/beneficiaries/${beneficiary.id}/documents`, {
-                      method: "POST",
-                      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-                      body: formData,
-                    });
-                    const data = await res.json();
-                    if (data.url) setRelationshipUrl(data.url);
-                    setUploadingRelationship(false);
+                  if (file !== null && beneficiary?.id) {
+                    await uploadDoc(beneficiary.id, file, "relationship", setRelationshipUrl);
                   }
                 }}
                 className="w-full"

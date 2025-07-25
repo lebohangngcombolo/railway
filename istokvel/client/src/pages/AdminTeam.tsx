@@ -3,8 +3,7 @@ import { adminAPI } from '../services/api';
 import { 
   Plus, Search, Edit, Trash2, Shield, Users, UserPlus, 
   Lock, Unlock, Eye, EyeOff, AlertTriangle, CheckCircle,
-  Clock, Activity, Key, QrCode, Download, Loader, X,
-  Save, RotateCcw, UserCheck, UserX, Settings, Copy
+  Clock, Activity, Key, Loader, X, Copy
 } from 'lucide-react';
 
 interface Admin {
@@ -56,7 +55,6 @@ const AdminTeam: React.FC = () => {
   const [showAddAdmin, setShowAddAdmin] = useState(false);
   const [showAddRole, setShowAddRole] = useState(false);
   const [showMfaSetup, setShowMfaSetup] = useState(false);
-  const [showRoleDetails, setShowRoleDetails] = useState(false);
   const [showEditAdmin, setShowEditAdmin] = useState(false);
   const [showEditRole, setShowEditRole] = useState(false);
   const [selectedRole, setSelectedRole] = useState<Role | null>(null);
@@ -290,23 +288,11 @@ const AdminTeam: React.FC = () => {
     }
   };
 
-  const handleUpdateAdminRole = async (adminId: number, roleId: number) => {
+  // adminId and lock are currently unused, but kept for future implementation
+  const handleLockAdmin = async (_adminId: number, _lock: boolean) => {
     try {
       setSubmitting(true);
-      await adminAPI.updateAdminRole(adminId, { role_id: roleId });
-      fetchData();
-    } catch (error) {
-      console.error('Error updating admin role:', error);
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
-  const handleLockAdmin = async (adminId: number, lock: boolean) => {
-    try {
-      setSubmitting(true);
-      // Add this endpoint to your backend if it doesn't exist
-      await adminAPI.lockAdmin(adminId, { locked: lock });
+      // TODO: Implement lockAdmin in adminAPI if needed
       fetchData();
     } catch (error) {
       console.error('Error updating admin lock status:', error);
@@ -641,7 +627,7 @@ const AdminTeam: React.FC = () => {
                   <button
                     onClick={() => {
                       setSelectedRole(role);
-                      setShowRoleDetails(true);
+                      setShowEditRole(true);
                     }}
                     className="text-blue-600 hover:text-blue-900 p-1"
                     title="View Details"
@@ -995,7 +981,7 @@ const AdminTeam: React.FC = () => {
                           <label key={action} className="flex items-center">
                             <input
                               type="checkbox"
-                              checked={enabled}
+                              checked={!!enabled}
                               onChange={(e) => setRoleForm({
                                 ...roleForm,
                                 permissions: {
@@ -1085,7 +1071,7 @@ const AdminTeam: React.FC = () => {
                           <label key={action} className="flex items-center">
                             <input
                               type="checkbox"
-                              checked={enabled}
+                              checked={!!enabled}
                               onChange={(e) => setEditRoleForm({
                                 ...editRoleForm,
                                 permissions: {

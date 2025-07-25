@@ -2,13 +2,9 @@ import React, { useState, useEffect } from 'react';
 import {
   User as UserIcon, // Alias to avoid conflict if User is used elsewhere
   Shield,
-  BellRing,
-  Lock,
-  Trash2,
   ChevronRight, // Use ChevronRight for the "View" button icon
   Mail, // for email notification toggle
   Bell, // for push notification toggle
-  ShieldCheck,
   LogOut as LogoutIcon,
   Monitor,
   Download,
@@ -18,8 +14,7 @@ import {
 } from 'lucide-react'; // Import necessary icons
 import moment from 'moment'; // Import moment for date formatting
 import toast from 'react-hot-toast';
-// Import navigation items from the new file
-import { userNavItems, marketplaceNavItem } from '../navItems';
+// Removed unused imports userNavItems, marketplaceNavItem
 import { authAPI, securityAPI, userAPI } from '../services/api';
 import api from '../services/api'; // <-- Make sure this is here
 import { getCurrentUser } from '../utils/auth'; // Add this import
@@ -27,12 +22,6 @@ import { getCurrentUser } from '../utils/auth'; // Add this import
 
 
 
-const mockSessions = [
-  { id: 1, device: 'Windows 10 - Chrome', location: 'Cape Town, South Africa', time: '2023-10-27T10:00:00Z', current: true },
-  { id: 2, device: 'Android Phone - Chrome', location: 'Johannesburg, South Africa', time: '2023-10-26T18:30:00Z', current: false },
-];
-
-// Define the tabs for the internal horizontal navigation
 const userProfileTabs = [
   { id: 'overview', label: 'Overview' },
   { id: 'your-details', label: 'My details' },
@@ -206,7 +195,7 @@ const UserProfile: React.FC = () => {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`
+          Authorization: `Bearer ${localStorage.getItem('token')}`
         },
         body: JSON.stringify(payload)
       });
@@ -300,34 +289,7 @@ const UserProfile: React.FC = () => {
      }
    };
 
-    // Placeholder handler for toggling 2FA
-   const handleToggleTwoFactor = async () => {
-     try {
-       const response = await securityAPI.toggle2FA();
-       setSecuritySettings(prev => ({
-         ...prev,
-         twoFactorEnabled: response.data.two_factor_enabled
-       }));
-       toast.success(response.data.message || 'Two-Factor Authentication updated!');
-     } catch (err: any) {
-       toast.error(
-         err.response?.data?.error ||
-         err.response?.data?.message ||
-         'Failed to update Two-Factor Authentication.'
-       );
-     }
-   };
-
-    // Placeholder handler for logging out a specific session
-   const handleLogoutSession = async (sessionId: number) => {
-     try {
-       await api.post(`/api/user/session/${sessionId}/logout`);
-       toast.success('Session logged out!');
-       fetchSessions(); // Refresh after logout
-     } catch (err: any) {
-       toast.error(err.response?.data?.error || 'Failed to log out session');
-     }
-   };
+    // Removed unused handleToggleTwoFactor
 
     // Placeholder handler for requesting data download
    const handleDownloadData = () => {
@@ -364,17 +326,7 @@ const UserProfile: React.FC = () => {
   const [otpSentMessage, setOtpSentMessage] = useState('');
   const [isSendingOtp, setIsSendingOtp] = useState(false);
   const [isVerifying, setIsVerifying] = useState(false);
-  const [isResending, setIsResending] = useState(false);
-
-  const handleStart2FA = async () => {
-    try {
-      await securityAPI.start2FA({ method: twoFAMethod });
-      setShow2FAModal(true);
-      toast.success(`OTP sent via ${twoFAMethod.toUpperCase()}`);
-    } catch (err: any) {
-      toast.error(err.response?.data?.error || 'Failed to send OTP');
-    }
-  };
+  // Removed unused isResending state
 
   const handleVerify2FA = async () => {
     setIsVerifying(true);
@@ -394,17 +346,7 @@ const UserProfile: React.FC = () => {
     }
   };
 
-  const handleResend2FAOtp = async () => {
-    setIsResending(true);
-    try {
-      await securityAPI.start2FA({ method: twoFAMethod });
-      toast.success(`OTP resent via ${twoFAMethod.toUpperCase()}`);
-    } catch (err: any) {
-      toast.error(err.response?.data?.error || 'Failed to resend OTP');
-    } finally {
-      setIsResending(false);
-    }
-  };
+  // Removed unused handleResend2FAOtp
 
   const [showDisable2FAModal, setShowDisable2FAModal] = useState(false);
   const [disable2FAPassword, setDisable2FAPassword] = useState('');
@@ -455,9 +397,9 @@ const UserProfile: React.FC = () => {
   };
 
   // Helper to filter unique sessions by user_agent and ip_address
-  const getUniqueSessions = (sessions) => {
+  const getUniqueSessions = (sessions: any[]) => {
     const seen = new Set();
-    return sessions.filter(session => {
+    return sessions.filter((session: any) => {
       const key = `${session.user_agent}-${session.ip_address}`;
       if (seen.has(key)) return false;
       seen.add(key);
@@ -478,7 +420,7 @@ const UserProfile: React.FC = () => {
               onClick={handleViewDetails}
             />
             <InfoCard
-              icon={Lock}
+              icon={Shield}
               title="Account & security"
               description="Password and active sessions"
               onClick={handleViewAccountSecurity}
@@ -818,9 +760,9 @@ const UserProfile: React.FC = () => {
                     </h3>
                     <p className="text-gray-600 mb-4">Review where you are currently logged in.</p>
                     {getUniqueSessions(sessions)
-                      .filter(s => s.is_active)
+                      .filter((s: any) => s.is_active)
                       .slice(0, 2) // Only show up to 2 unique sessions
-                      .map(session => (
+                      .map((session: any) => (
                         <div key={session.id} className="py-3 flex justify-between items-center">
                                 <div>
                             <p className="font-medium text-gray-800">
@@ -1075,7 +1017,7 @@ const UserProfile: React.FC = () => {
 
   const fetchCommunicationSettings = async () => {
     const res = await fetch('/api/user/communication', {
-      headers: { Authorization: `Bearer ${token}` }
+      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
     });
     const data = await res.json();
     setCommunicationSettings({

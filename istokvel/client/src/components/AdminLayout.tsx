@@ -2,20 +2,16 @@ import React, { useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import AdminSidebar from './AdminSidebar';
 import AdminNavbar from './AdminNavbar';
-import { useAuth } from '../hooks/useAuth';
-import ProfileDropdown from './ProfileDropdown';
-import { Menu, Bell } from 'lucide-react';
 
 const AdminLayout: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const { user } = useAuth();
+  // Removed unused user variable
 
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900 flex flex-col">
       {/* Top Navbar */}
       <AdminNavbar 
         onToggleSidebar={() => setSidebarOpen(!sidebarOpen)} 
-        showAdminName={false}
       />
 
       {/* Sidebar and Main Content */}

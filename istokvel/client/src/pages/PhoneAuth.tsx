@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { sendSmsVerificationCode, verifyPhoneCode, resendSmsVerificationCode, login } from '../utils/auth';
+import { sendSmsVerificationCode, verifyPhoneCode, resendSmsVerificationCode } from '../utils/auth';
 import { toast } from 'react-toastify';
 
 const Spinner = ({ className = "h-5 w-5" }) => (
@@ -16,10 +16,7 @@ const PhoneAuth: React.FC = () => {
   const [step, setStep] = useState<'input' | 'verify' | 'password'>('input');
   const [isLoading, setIsLoading] = useState(false);
   const [otpError, setOtpError] = useState('');
-  const [codeSent, setCodeSent] = useState(false);
   const [verifying, setVerifying] = useState(false);
-  const [password, setPassword] = useState('');
-  const [loginError, setLoginError] = useState('');
   const navigate = useNavigate();
 
   // Helper to mask phone except last 4 digits
@@ -37,43 +34,20 @@ const PhoneAuth: React.FC = () => {
     setIsLoading(false);
     if (result.success) {
       setStep('verify');
-      setCodeSent(true);
       toast.success('Verification code sent!');
     } else {
       toast.error(result.message || 'Failed to send verification code.');
     }
   };
 
-  const handleOtpChange = (index: number, value: string) => {
-    if (value.length > 1) {
-      const values = value.split('').slice(0, 6);
-      setOtp(values.concat(Array(6 - values.length).fill('')));
-      if (values.length === 6) {
-        setTimeout(() => {
-          handleVerifyOtp(new Event('submit') as any, values.join(''));
-        }, 100);
-      }
-      return;
-    }
-    const newOtp = [...otp];
-    newOtp[index] = value;
-    setOtp(newOtp);
-    if (index === 5 && value) {
-      setTimeout(() => {
-        handleVerifyOtp(new Event('submit') as any, newOtp.join(''));
-      }, 100);
-    }
-  };
-
-  const handleVerifyOtp = async (e: React.FormEvent, code?: string) => {
+  const handleVerifyOtp: React.FormEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault();
-    const verificationCode = code || otp.join('');
-    if (verificationCode.length !== 6) {
+    if (otp.some(digit => !digit)) {
       setOtpError('Please enter the complete 6-digit code');
       return;
     }
     setVerifying(true);
-    const result = await verifyPhoneCode(phone, verificationCode);
+    const result = await verifyPhoneCode(phone, otp.join(''));
     if (result.success) {
       // Store token and user info if present
       if (result.access_token && result.user) {
@@ -102,31 +76,7 @@ const PhoneAuth: React.FC = () => {
     setOtpError('');
     await resendSmsVerificationCode(phone);
     setOtp(['', '', '', '', '', '']);
-    setCodeSent(true);
-    setIsLoading(false);
-  };
-
-  const handleLoginAfterOtp = async (phone, password) => {
-    const result = await login(phone, password);
-    if (result.success) {
-      // Store token is handled in your login util
-      navigate('/dashboard');
-    } else {
-      toast.error(result.message || 'Login failed');
-    }
-  };
-
-  const handlePasswordSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-    setLoginError('');
-    const result = await login(phone, password); // Your login util must support phone+password
-    if (result.success) {
-      toast.success('Login successful! Redirecting...');
-      navigate('/dashboard');
-    } else {
-      setLoginError(result.message || 'Login failed. Please try again.');
-    }
+    toast.success('Verification code resent!');
     setIsLoading(false);
   };
 
@@ -243,7 +193,7 @@ const PhoneAuth: React.FC = () => {
                       // Optionally, auto-submit if all 6 digits are pasted
                       if (pasted.length === 6) {
                         setTimeout(() => {
-                          handleVerifyOtp(new Event('submit') as any, pasted);
+                          handleVerifyOtp(new Event('submit') as any);
                         }, 100);
                       }
                     }

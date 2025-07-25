@@ -40,10 +40,9 @@ const KYCManagement: React.FC = () => {
   const [selectedSubmission, setSelectedSubmission] = useState<KYCSubmission | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [previewType, setPreviewType] = useState<'image' | 'pdf' | null>(null);
-  const [previewLabel, setPreviewLabel] = useState<string>('');
   const [actionLoading, setActionLoading] = useState(false);
 
-  const backendUrl = import.meta.env.VITE_API_URL || "http://localhost:5001";
+  const backendUrl = import.meta.env.VITE_API_URL || "https://server-batm.onrender.com";
 
   useEffect(() => {
     fetchSubmissions();
@@ -151,7 +150,7 @@ const KYCManagement: React.FC = () => {
       .toUpperCase();
   };
 
-  function DocPreview({ docPath, label, onPreview }: { docPath: string | null, label: string, onPreview: (url: string, type: 'image' | 'pdf', label: string) => void }) {
+  function DocPreview({ docPath, label, onPreview }: { docPath: string | null, label: string, onPreview: (url: string, type: 'image' | 'pdf') => void }) {
     const url = getDocUrl(docPath);
     if (!url) {
       return (
@@ -169,7 +168,7 @@ const KYCManagement: React.FC = () => {
               alt={label}
             className="rounded shadow max-w-[80px] max-h-[80px] object-cover border transition-transform duration-200 group-hover:scale-105 cursor-pointer"
               title={label}
-              onClick={() => onPreview(url, 'image', label)}
+              onClick={() => onPreview(url, 'image')}
             />
           <a
             href={url}
@@ -187,7 +186,7 @@ const KYCManagement: React.FC = () => {
         <div className="flex flex-col items-center group">
           <div
             className="w-[80px] h-[100px] border rounded group-hover:shadow-lg transition-shadow flex items-center justify-center bg-gray-50 cursor-pointer"
-            onClick={() => onPreview(url, 'pdf', label)}
+            onClick={() => onPreview(url, 'pdf')}
             title={`Preview ${label}`}
           >
             <FileText className="w-8 h-8 text-gray-400" />
@@ -223,6 +222,8 @@ const KYCManagement: React.FC = () => {
       </div>
     );
   }
+
+  // Removed unused isImagePreview and isPdfPreview variables
 
   return (
     <div className="bg-white p-6 rounded-lg shadow-md">
@@ -414,10 +415,10 @@ const KYCManagement: React.FC = () => {
             <div className="px-6 py-4">
               <div className="font-semibold text-gray-700 mb-2">Documents</div>
               <div className="grid grid-cols-2 gap-3">
-              <DocPreview docPath={selectedSubmission.id_document_path} label="ID Document" onPreview={(url, type, label) => { setPreviewUrl(url); setPreviewType(type); setPreviewLabel(label); }} />
-              <DocPreview docPath={selectedSubmission.proof_of_address_path} label="Proof of Address" onPreview={(url, type, label) => { setPreviewUrl(url); setPreviewType(type); setPreviewLabel(label); }} />
-              <DocPreview docPath={selectedSubmission.proof_of_income_path} label="Proof of Income" onPreview={(url, type, label) => { setPreviewUrl(url); setPreviewType(type); setPreviewLabel(label); }} />
-              <DocPreview docPath={selectedSubmission.bank_statement_path} label="Bank Statement" onPreview={(url, type, label) => { setPreviewUrl(url); setPreviewType(type); setPreviewLabel(label); }} />
+              <DocPreview docPath={selectedSubmission.id_document_path} label="ID Document" onPreview={(url, type) => { setPreviewUrl(url); setPreviewType(type); }} />
+              <DocPreview docPath={selectedSubmission.proof_of_address_path} label="Proof of Address" onPreview={(url, type) => { setPreviewUrl(url); setPreviewType(type); }} />
+              <DocPreview docPath={selectedSubmission.proof_of_income_path} label="Proof of Income" onPreview={(url, type) => { setPreviewUrl(url); setPreviewType(type); }} />
+              <DocPreview docPath={selectedSubmission.bank_statement_path} label="Bank Statement" onPreview={(url, type) => { setPreviewUrl(url); setPreviewType(type); }} />
             </div>
             </div>
 
@@ -488,11 +489,11 @@ const KYCManagement: React.FC = () => {
             >
               &times;
             </button>
-            <div className="mb-4 text-lg font-semibold">{previewLabel}</div>
+            <div className="mb-4 text-lg font-semibold">{previewType === 'image' ? 'Image Preview' : 'PDF Preview'}</div>
             {previewType === 'image' ? (
-              <img src={previewUrl} alt={previewLabel} className="max-h-[70vh] max-w-full rounded shadow" />
+              <img src={previewUrl} alt={previewType === 'image' ? 'Image Preview' : 'PDF Preview'} className="max-h-[70vh] max-w-full rounded shadow" />
             ) : (
-              <iframe src={previewUrl} title={previewLabel} className="w-full h-[70vh] rounded shadow" />
+              <iframe src={previewUrl} title={previewType === 'pdf' ? 'PDF Preview' : 'Image Preview'} className="w-full h-[70vh] rounded shadow" />
             )}
           </div>
         </div>

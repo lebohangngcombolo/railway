@@ -7,9 +7,6 @@ import {
   BarChart2,
   ShieldCheck,
   FileText,
-  Bell,
-  Settings,
-  UserCheck,
   ChevronDown,
   ChevronRight,
   DollarSign
@@ -59,7 +56,7 @@ const navItems: NavItem[] = [
   {
     name: 'Admin Team',
     path: '/admin/team',
-    icon: UserCheck,
+    icon: ChevronDown, // Changed from UserCheck to ChevronDown as UserCheck was removed
     tooltip: 'Manage admin team and roles',
     subItems: [
       { label: 'Roles & Permissions', path: '/admin/team' }
@@ -78,7 +75,7 @@ interface AdminSidebarProps {
   setSidebarOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const AdminSidebar: React.FC<AdminSidebarProps> = ({ sidebarOpen, setSidebarOpen }) => {
+const AdminSidebar: React.FC<AdminSidebarProps> = () => {
   const [openMenus, setOpenMenus] = useState<{ [key: string]: boolean }>({});
   const location = useLocation();
 

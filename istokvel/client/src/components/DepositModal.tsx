@@ -19,8 +19,6 @@ const DepositModal: React.FC<DepositModalProps> = ({ open, onClose, cards, onDep
   const fee = amountNum > 0 ? Math.max(2, amountNum * 0.015) : 0;
   const total = amountNum + fee;
 
-  const isValid = amountNum > 0 && method;
-
   const handleDeposit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);

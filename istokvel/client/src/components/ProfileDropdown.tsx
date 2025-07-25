@@ -1,6 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { User, Bell, Settings, LogOut, Camera, X, Upload, Image, Sparkles, Wand2, Moon, Sun } from 'lucide-react';
-import Button from './Button';
+import { User, Bell, LogOut, Camera, X, Upload, Sparkles, Moon, Sun } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTheme } from 'next-themes';

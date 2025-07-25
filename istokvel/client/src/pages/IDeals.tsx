@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
 import DealDetailModal from "../components/DealDetailModal";
 
 // Example deals data (add your own images to public/ideals/)
@@ -52,7 +51,7 @@ const categories = ["All", ...Array.from(new Set(IDEALS.map(d => d.category)))];
 
 const IDeals: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState("All");
-  const [selectedDeal, setSelectedDeal] = useState(null);
+  const [selectedDeal, setSelectedDeal] = useState<any>(null);
 
   const filteredDeals =
     selectedCategory === "All"

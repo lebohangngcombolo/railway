@@ -76,20 +76,9 @@ export const getCards = async (): Promise<Card[]> => {
 };
 
 export const addCard = async (cardData: any) => {
-  const payload = {
-    cardholder: cardData.cardholder,
-    cardNumber: cardData.cardNumber, // Must match this key exactly
-    expiry: cardData.expiry,
-    cvv: cardData.cvv,
-    primary: cardData.primary ?? false
-  };
-
-  console.log("[payload]", payload); // Debug log
-  const response = await api.post('/api/wallet/cards', payload);
+  const response = await api.post('/api/wallet/cards', cardData);
   return response.data;
 };
-
-
 
 export const deleteCard = async (cardId: number): Promise<{ message: string }> => {
   const { data } = await api.delete(`/api/wallet/cards/${cardId}`);

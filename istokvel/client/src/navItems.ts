@@ -5,8 +5,6 @@ import {
   Users,
   Briefcase,
   ShoppingBag,
-  LayoutDashboard,
-  UserPlus,
   DollarSign,
   FileText,
   BarChart2,

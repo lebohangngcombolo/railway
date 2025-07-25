@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Line } from "react-chartjs-2";
 import { Star, Users } from "lucide-react";
@@ -10,7 +10,6 @@ ChartJS.register(LineElement, PointElement, LinearScale, CategoryScale, Tooltip,
 const Dashboard = () => {
   const [user, setUser] = useState<any>(null);
   const [userStats, setUserStats] = useState<any>(null);
-  const [availableGroups, setAvailableGroups] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
@@ -24,15 +23,13 @@ const Dashboard = () => {
         setLoading(true);
         setError(null);
         
-        const [userResponse, statsResponse, groupsResponse] = await Promise.all([
+        const [userResponse, statsResponse] = await Promise.all([
           userAPI.getProfile(),
           userAPI.getUserStats(),
-          userAPI.getAvailableGroups()
         ]);
         
         setUser(userResponse.data);
         setUserStats(statsResponse.data);
-        setAvailableGroups(groupsResponse.data);
       } catch (err: any) {
         if (err.response?.status === 401) {
           setError('Your session has expired. Please log in again.');

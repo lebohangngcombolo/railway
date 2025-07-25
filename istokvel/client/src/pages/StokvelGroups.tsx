@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { Search, Filter, CheckCircle, Star, Users, ShieldCheck, TrendingUp, Gift } from "lucide-react";
 import { toast } from "react-hot-toast";
 import { groupService } from '../services/groupService';
 import { useNavigate } from "react-router-dom";
@@ -133,7 +132,8 @@ const tierDetails: Record<string, Record<string, {
   }
 };
 
-const categoryTiers = {
+type CategoryTierKey = 'Savings' | 'Burial' | 'Investment' | 'Business' | string;
+const categoryTiers: Record<CategoryTierKey, { name: string; amount: string; color: string; }[]> = {
   Savings: [
     { name: "Bronze", amount: "R300", color: "bg-green-100 text-green-800" },
     { name: "Silver", amount: "R700", color: "bg-green-200 text-green-900" },
@@ -162,8 +162,6 @@ const categoryTiers = {
 
 const StokvelGroups: React.FC = () => {
   const [search, setSearch] = useState("");
-  const [allGroups, setAllGroups] = useState<any[]>([]);
-  const [categories, setCategories] = useState<string[]>([]);
   const [activeCategory, setActiveCategory] = useState<string>("");
   const [joinRequests, setJoinRequests] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -211,11 +209,9 @@ const StokvelGroups: React.FC = () => {
       try {
         const res = await groupService.getAvailableGroups();
         const groups = res.data;
-        setAllGroups(groups);
         const uniqueCategories = [...new Set(groups.map((group: any) => group.category))];
-        setCategories(uniqueCategories);
         if (uniqueCategories.length > 0 && !activeCategory) {
-          setActiveCategory(uniqueCategories[0]);
+          setActiveCategory(String(uniqueCategories[0]));
         }
       } catch (err) {
         toast.error("Failed to load groups");
@@ -229,12 +225,6 @@ const StokvelGroups: React.FC = () => {
   useEffect(() => {
     fetchRequests();
   }, []);
-
-  // Filter groups by active category
-  const filteredGroups = allGroups.filter(group => 
-    group.category === activeCategory &&
-    group.name.toLowerCase().includes(search.toLowerCase())
-  );
 
   // Get join request status for a group/tier/amount
   const getRequestStatus = (category: string, tier: string, amount: number) => {
@@ -260,12 +250,6 @@ const StokvelGroups: React.FC = () => {
       }
     }
     return amounts;
-  }
-
-  // Find groupId for a given category/tier
-  function findGroupId(category: string, tier: string) {
-    const group = allGroups.find(g => g.category === category && g.tier === tier);
-    return group ? group.id : null;
   }
 
   // Handle join
@@ -360,7 +344,7 @@ const StokvelGroups: React.FC = () => {
         <div>
           <h2 className="font-semibold text-lg mb-3">{selectedCategory} Tiers</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
-            {categoryTiers[selectedCategory].map((tier) => {
+            {(categoryTiers[selectedCategory as CategoryTierKey] || []).map((tier: any) => {
               const details = tierDetails[selectedCategory][tier.name];
               return (
                 <div
@@ -467,14 +451,14 @@ const StokvelGroups: React.FC = () => {
           <h2 className="text-lg font-bold mb-4">My Request Status</h2>
           <div className="bg-white rounded-xl shadow-lg overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
+              <thead className="bg-[#3B4CCA]">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Group</th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Tier</th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Amount</th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Status</th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Date</th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Reason</th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-white uppercase">Group</th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-white uppercase">Tier</th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-white uppercase">Amount</th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-white uppercase">Status</th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-white uppercase">Date</th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-white uppercase">Reason</th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-100">

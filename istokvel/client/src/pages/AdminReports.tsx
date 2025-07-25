@@ -93,7 +93,7 @@ const AdminReports: React.FC = () => {
             }));
             // Update type options for transactions
             const transactionTypes = [...new Set(result.map((item: any) => item.transaction_type))];
-            setTypeOptions(['All Types', ...transactionTypes]);
+            setTypeOptions(['All Types', ...(transactionTypes as string[])]);
             break;
             
           case 'contributions':
@@ -160,7 +160,7 @@ const AdminReports: React.FC = () => {
               type: item.category, // for type filtering
             }));
             const groupTypes = [...new Set(result.map((item: any) => item.category))];
-            setTypeOptions(['All Types', ...groupTypes]);
+            setTypeOptions(['All Types', ...(groupTypes as string[])]);
             break;
             
           case 'referrals':
@@ -182,7 +182,7 @@ const AdminReports: React.FC = () => {
         
         // Update status options based on current data
         const statuses = [...new Set(result.map((item: any) => item.status))];
-        setStatusOptions(['All Statuses', ...statuses]);
+        setStatusOptions(['All Statuses', ...(statuses as string[])]);
         
         setData((prev: any) => ({ ...prev, [activeTab]: result }));
       } catch (error) {
@@ -558,7 +558,7 @@ const AdminReports: React.FC = () => {
                 </td>
               </tr>
             ) : (
-              tableData.map((row, idx) => (
+              tableData.map((row: any, idx: number) => (
                 <tr key={idx} className={`${idx % 2 === 0 ? "bg-white" : "bg-gray-50"} hover:bg-gray-100 transition-colors`}>
                   {columns[activeTab].map(col => (
                     <td key={col} className="px-4 py-3 text-sm">
@@ -587,3 +587,4 @@ const AdminReports: React.FC = () => {
 };
 
 export default AdminReports;
+

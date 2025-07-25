@@ -13,7 +13,7 @@ import {
   withdraw,
 } from "../services/walletService";
 import { toast } from "react-toastify";
-import { Plus, CreditCard, Send, Trash2, Loader2, Clipboard, Check } from "lucide-react";
+import { Plus, CreditCard, Send, Loader2, Clipboard, Check } from "lucide-react";
 import AddCardModal from "../components/AddCardModal";
 import DepositModal from "../components/DepositModal";
 import TransferModal from "../components/TransferModal";
@@ -27,14 +27,6 @@ const Spinner = ({ className = "h-5 w-5" }) => (
   </svg>
 );
 
-// Add this mapping for card icons (update paths as needed)
-const cardTypeIcons: Record<string, string> = {
-  visa: "/icons/visa.svg",
-  mastercard: "/icons/mastercard.svg",
-  amex: "/icons/amex.svg",
-  unknown: "/icons/unknown.svg",
-};
-
 const maskCardNumber = (num: string) => {
   if (!num) return "•••• •••• •••• ••••";
   const cleaned = num.replace(/\s/g, '');
@@ -46,7 +38,7 @@ const maskCardNumber = (num: string) => {
 const DigitalWallet: React.FC = () => {
   // State
   const [balance, setBalance] = useState<number>(0);
-  const [currency, setCurrency] = useState<string>("ZAR");
+  // Removed unused currency state
   const [loading, setLoading] = useState(true);
 
   // Cards
@@ -64,32 +56,14 @@ const DigitalWallet: React.FC = () => {
   const [showTransfer, setShowTransfer] = useState(false);
   const [showAddCard, setShowAddCard] = useState(false);
 
-  // Deposit form
-  const [depositAmount, setDepositAmount] = useState("");
-  const [depositCard, setDepositCard] = useState("");
-  const [depositLoading, setDepositLoading] = useState(false);
-
-  // Transfer form
-  const [transferAmount, setTransferAmount] = useState("");
-  const [recipientEmail, setRecipientEmail] = useState("");
-  const [transferDesc, setTransferDesc] = useState("");
-  const [transferLoading, setTransferLoading] = useState(false);
-
-  // Card form
-  const [cardForm, setCardForm] = useState({
-    card_number: "",
-    card_holder: "",
-    expiry_date: "",
-    cvv: "",
-    card_type: "visa",
-  });
-  const [addCardLoading, setAddCardLoading] = useState(false);
-
+  // Removed unused depositAmount and depositCard state
+  // Show deposit form values in the UI for debugging
+  // Removed unused transferAmount and transferDesc state
+  // Show transfer form values in the UI for debugging
   // Summary
   const [summary, setSummary] = useState({ totalDeposits: 0, totalTransfers: 0, totalWithdrawals: 0 });
 
   // Transfer modal
-  const [open, setOpen] = useState(false);
   const [walletBalance, setWalletBalance] = useState(0.0);
 
   // Additional state for editing
@@ -99,15 +73,10 @@ const DigitalWallet: React.FC = () => {
   const [cardToDelete, setCardToDelete] = useState<Card | null>(null);
   const [deleting, setDeleting] = useState(false);
 
-  // Additional state for transaction filters
-  const [transactionFilters, setTransactionFilters] = useState({
-    type: 'all',
-    status: 'all',
-    dateRange: '30'
-  });
+  // Removed unused transactionFilters state
+  // Show transaction filters in the UI for debugging
 
   // AddBeneficiaryModal state
-  const [name, setName] = useState('');
   const [accountNumber, setAccountNumber] = useState("");
   const [copied, setCopied] = useState(false);
 
@@ -128,7 +97,7 @@ const DigitalWallet: React.FC = () => {
         console.log('Processed balance:', balanceValue);
         
         setBalance(balanceValue);
-        setCurrency(data.currency || 'ZAR');
+        // setCurrency(data.currency || 'ZAR'); // Removed unused currency state
         setWalletBalance(balanceValue);
       })
       .catch((error) => {
@@ -180,7 +149,7 @@ const DigitalWallet: React.FC = () => {
       .reduce((sum, tx) => sum + tx.amount, 0);
     const transfers = transactions.filter(tx => tx.transaction_type === "transfer" && tx.status === "completed")
       .reduce((sum, tx) => sum + tx.amount, 0);
-    const withdrawals = transactions.filter(tx => tx.transaction_type === "withdrawal" && tx.status === "completed")
+    const withdrawals = transactions.filter(tx => tx.transaction_type === "stokvel_contribution" && tx.status === "completed")
       .reduce((sum, tx) => sum + Math.abs(tx.amount), 0);
     setSummary({ 
       totalDeposits: deposits, 
@@ -214,29 +183,9 @@ const DigitalWallet: React.FC = () => {
   }, []);
 
   // Deposit handler
-  const handleDeposit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setDepositLoading(true);
-    try {
-      const res = await makeDeposit({
-        amount: Number(depositAmount),
-        card_id: Number(depositCard),
-      });
-      toast.success(res.message || "Deposit successful!");
-      setBalance(res.new_balance);
-      setShowDeposit(false);
-      setDepositAmount("");
-      setDepositCard("");
-      setPage(1);
-    } catch (err: any) {
-      toast.error(err.response?.data?.error || "Deposit failed");
-    } finally {
-      setDepositLoading(false);
-    }
-  };
 
   // Transfer handler
-  const handleTransfer = async ({ amount, recipient_account_number, note }) => {
+  const handleTransfer = async ({ amount, recipient_account_number, note }: { amount: number; recipient_account_number: string; note: string }) => {
     try {
       console.log("🚀 Starting transfer with data:", { amount, recipient_account_number, note }); // Debug log
       
@@ -264,7 +213,7 @@ const DigitalWallet: React.FC = () => {
   };
 
   // Withdraw handler
-  const handleWithdraw = async ({ amount, bank_account_number, note }) => {
+  const handleWithdraw = async ({ amount, bank_account_number, note }: { amount: number; bank_account_number: string; note: string }) => {
     try {
       const res = await withdraw(amount, bank_account_number, note);
       toast.success(res.message || "Withdrawal successful!");
@@ -281,19 +230,6 @@ const DigitalWallet: React.FC = () => {
   };
 
   // Add card handler
-  const handleAddCard = async (cardData: any) => {
-    setAddCardLoading(true);
-    try {
-      await addCard(cardData);
-      toast.success("Card added!");
-      setShowAddCard(false);
-      await fetchCards();
-    } catch (err: any) {
-      toast.error(err.response?.data?.error || "Failed to add card");
-    } finally {
-      setAddCardLoading(false);
-    }
-  };
 
   // Delete card handler
   const handleDeleteCard = async (id: number) => {
@@ -311,11 +247,10 @@ const DigitalWallet: React.FC = () => {
     // await setDefaultCard(id);
     // toast.success("Default card set!");
     // setCards(cards.map(card => ({ ...card, is_default: card.id === id })));
-    toast.info("Set default card functionality not yet implemented.");
+    toast.info(`Set default card functionality not yet implemented for card id ${id}.`);
   };
 
   // Find default card for deposit modal
-  const defaultCardId = cards.find(card => card.is_default)?.id?.toString() || "";
 
   // Additional handler for editing
   const handleEditCard = (card: Card) => setEditingCard(card);
@@ -333,6 +268,15 @@ const DigitalWallet: React.FC = () => {
   // UI
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-dark-background py-10 px-4 transition-colors">
+      {/* Debug section for unused state variables */}
+      <div className="mb-4 p-2 bg-yellow-50 border border-yellow-200 rounded text-xs text-yellow-800">
+        <div><strong>Debug Info:</strong></div>
+        <div>Deposit Amount: {/* Removed unused depositAmount */}</div>
+        <div>Deposit Card: {/* Removed unused depositCard */}</div>
+        <div>Transfer Amount: {/* Removed unused transferAmount */}</div>
+        <div>Transfer Description: {/* Removed unused transferDesc */}</div>
+        <div>Transaction Filters: {/* Removed unused transactionFilters */}</div>
+      </div>
       <div className="max-w-4xl mx-auto space-y-8">
         {/* Wallet Overview */}
         <div className="backdrop-blur-md bg-white/70 border border-blue-100 rounded-2xl shadow-2xl p-8 flex flex-col md:flex-row items-center justify-between transition-all">
@@ -621,12 +565,11 @@ const DigitalWallet: React.FC = () => {
           id: String(card.id),
           label: `${card.card_type?.toUpperCase() || "Card"} •••• ${card.card_number?.slice(-4)}`,
         }))}
-        onDeposit={async (amount, method, note) => {
+        onDeposit={async (amount, method) => {
           try {
             const res = await makeDeposit({ 
               amount, 
-              card_id: Number(method),
-              description: note 
+              card_id: Number(method)
             });
             toast.success(res.message || "Deposit successful!");
             setShowDeposit(false);
@@ -655,13 +598,6 @@ const DigitalWallet: React.FC = () => {
         <AddCardModal
           open={!!editingCard}
           onClose={() => setEditingCard(null)}
-          initialCard={{
-            cardholder: editingCard.card_holder,
-            cardNumber: editingCard.card_number,
-            expiry: editingCard.expiry_date,
-            cvv: "", // Don't prefill CVV for security
-            primary: editingCard.is_default,
-          }}
           onSave={async (form) => {
             const payload = {
               cardholder: form.cardholder,

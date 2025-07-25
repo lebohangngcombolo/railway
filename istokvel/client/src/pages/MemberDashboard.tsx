@@ -1,21 +1,39 @@
 import { motion } from 'framer-motion';
 import {
-  Users,
-  CreditCard,
-  Calendar,
   Bell,
-  TrendingUp,
   Clock
 } from 'lucide-react';
-import DashboardLayout from '../../components/DashboardLayout';
-import { memberNavItems, marketplaceNavItem } from '../../navItems';
+import DashboardLayout from '../components/DashboardLayout';
 import { useAuth } from '../hooks/useAuth';
 import api from '../services/api';
 import { useEffect, useState } from 'react';
 
+interface MemberData {
+  stokvelInfo: {
+    groupName: string;
+    joinDate: string;
+    monthlyContribution: number;
+  };
+  contributionStatus: {
+    nextPayment: string;
+  };
+  announcements: {
+    id: string;
+    title: string;
+    message: string;
+    date: string;
+  }[];
+  recentActivity: {
+    id: string;
+    title: string;
+    description: string;
+    date: string;
+  }[];
+}
+
 const MemberDashboard: React.FC = () => {
   const { user } = useAuth();
-  const [memberData, setMemberData] = useState<any>(null);
+  const [memberData, setMemberData] = useState<MemberData | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -35,15 +53,8 @@ const MemberDashboard: React.FC = () => {
   if (loading) return <div>Loading...</div>;
 
   return (
-    <DashboardLayout
-      user={{
-        name: "Member User",
-        email: "member@example.com",
-        role: "member"
-      }}
-      sidebarNavItems={memberNavItems}
-      marketplaceNavItem={marketplaceNavItem}
-    >
+    <>
+      <DashboardLayout />
       <div className="max-w-7xl mx-auto">
         {/* Welcome Section */}
         <motion.div
@@ -67,17 +78,17 @@ const MemberDashboard: React.FC = () => {
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <span className="text-gray-600">Group Name</span>
-                <span className="font-medium">{memberData.stokvelInfo?.groupName}</span>
+                <span className="font-medium">{memberData?.stokvelInfo?.groupName}</span>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-gray-600">Member Since</span>
                 <span className="font-medium">
-                  {new Date(memberData.stokvelInfo?.joinDate).toLocaleDateString()}
+                  {memberData?.stokvelInfo?.joinDate ? new Date(memberData.stokvelInfo.joinDate).toLocaleDateString() : 'N/A'}
                 </span>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-gray-600">Monthly Contribution</span>
-                <span className="font-medium">R {memberData.stokvelInfo?.monthlyContribution}</span>
+                <span className="font-medium">R {memberData?.stokvelInfo?.monthlyContribution}</span>
               </div>
             </div>
           </motion.div>
@@ -97,7 +108,7 @@ const MemberDashboard: React.FC = () => {
               <div className="flex items-center justify-between">
                 <span className="text-gray-600">Next Payment</span>
                 <span className="font-medium">
-                  {new Date(memberData.contributionStatus?.nextPayment).toLocaleDateString()}
+                  {memberData?.contributionStatus?.nextPayment ? new Date(memberData.contributionStatus.nextPayment).toLocaleDateString() : 'N/A'}
                 </span>
               </div>
               <button className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-colors">
@@ -114,7 +125,7 @@ const MemberDashboard: React.FC = () => {
           >
             <h2 className="text-lg font-semibold mb-4">Announcements</h2>
             <div className="space-y-4">
-              {memberData.announcements.map((announcement) => (
+              {memberData?.announcements.map((announcement) => (
                 <div
                   key={announcement.id}
                   className="p-4 bg-gray-50 rounded-lg"
@@ -125,7 +136,7 @@ const MemberDashboard: React.FC = () => {
                   </div>
                   <p className="text-sm text-gray-600">{announcement.message}</p>
                   <p className="text-xs text-gray-500 mt-2">
-                    {new Date(announcement.date).toLocaleDateString()}
+                    {announcement.date ? new Date(announcement.date).toLocaleDateString() : 'N/A'}
                   </p>
                 </div>
               ))}
@@ -141,7 +152,7 @@ const MemberDashboard: React.FC = () => {
         >
           <h2 className="text-lg font-semibold mb-4">Recent Activity</h2>
           <div className="space-y-4">
-            {memberData.recentActivity.map((activity) => (
+            {memberData?.recentActivity.map((activity) => (
               <div
                 key={activity.id}
                 className="flex items-start space-x-4 p-4 bg-gray-50 rounded-lg"
@@ -153,7 +164,7 @@ const MemberDashboard: React.FC = () => {
                   <p className="font-medium">{activity.title}</p>
                   <p className="text-sm text-gray-600">{activity.description}</p>
                   <p className="text-xs text-gray-500 mt-1">
-                    {new Date(activity.date).toLocaleDateString()}
+                    {activity.date ? new Date(activity.date).toLocaleDateString() : 'N/A'}
                   </p>
                 </div>
               </div>
@@ -161,7 +172,7 @@ const MemberDashboard: React.FC = () => {
           </div>
         </motion.div>
       </div>
-    </DashboardLayout>
+    </>
   );
 };
 

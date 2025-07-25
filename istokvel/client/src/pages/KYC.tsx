@@ -232,14 +232,6 @@ const KYC = () => {
     }
   };
 
-  const clearDocumentsOnly = () => {
-    setFormData(prev => ({
-      ...prev,
-      documents: { idDocument: null, proofOfAddress: null, proofOfIncome: null, bankStatement: null }
-    }));
-    setUploadedDocuments({});
-  };
-
   const handleSubmitForVerification = async () => {
     // Validate required fields
     if (!formData.personal.fullName.trim()) {
@@ -1138,31 +1130,6 @@ const KYC = () => {
         return null;
     }
   };
-
-  const renderKYCDetailsSummary = () => (
-    <div className="space-y-2">
-      <div><strong>Full Name:</strong> {formData.personal.fullName}</div>
-      <div><strong>Date of Birth:</strong> {formData.personal.dateOfBirth}</div>
-      <div><strong>ID Number:</strong> {formData.personal.idNumber}</div>
-      <div><strong>Phone:</strong> {formData.personal.phone}</div>
-      <div><strong>Email:</strong> {formData.personal.email}</div>
-      <div><strong>Employment Status:</strong> {formData.personal.employmentStatus}</div>
-      <div><strong>Employer Name:</strong> {formData.personal.employerName}</div>
-      <div><strong>Street Address:</strong> {formData.address.streetAddress}</div>
-      <div><strong>City:</strong> {formData.address.city}</div>
-      <div><strong>Province:</strong> {formData.address.province}</div>
-      <div><strong>Postal Code:</strong> {formData.address.postalCode}</div>
-      <div><strong>Country:</strong> {formData.address.country}</div>
-      <div><strong>Monthly Income:</strong> {formData.income.monthlyIncome}</div>
-      <div><strong>Income Source:</strong> {formData.income.incomeSource}</div>
-      <div><strong>Employment Type:</strong> {formData.income.employmentType}</div>
-      <div><strong>Bank Name:</strong> {formData.bank.bankName}</div>
-      <div><strong>Account Number:</strong> {formData.bank.accountNumber}</div>
-      <div><strong>Account Type:</strong> {formData.bank.accountType}</div>
-      <div><strong>Branch Code:</strong> {formData.bank.branchCode}</div>
-      {/* Add document links if needed */}
-    </div>
-  );
 
   if (isLoading) {
     return (
