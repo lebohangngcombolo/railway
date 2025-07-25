@@ -12,7 +12,7 @@ const GoogleLoginButton = () => {
     console.log("Google credential:", credentialResponse?.credential); // Debug log
 
     try {
-      const res = await axios.post("http://localhost:5001/api/auth/google", {
+      const res = await axios.post("https://istokvela.onrender.com/api/auth/google", {
         token: credentialResponse.credential,
       });
 
