@@ -8,7 +8,7 @@ export default defineConfig({
     port: 5173,
     host: true,
     proxy: {
-      '/api': 'https://server-batm.onrender.com',
+      '/api': 'https://istokvela.onrender.com',
     }
   },
   build: {
@@ -24,6 +24,6 @@ export default defineConfig({
     }
   },
   define: {
-    'import.meta.env.VITE_API_URL': JSON.stringify('https://server-batm.onrender.com')
+    'import.meta.env.VITE_API_URL': JSON.stringify('https://istokvela.onrender.com')
   }
 })
