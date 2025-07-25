@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { login } from '../utils/auth';
 import PageTransition from '../components/PageTransition';
 import { toast } from 'react-hot-toast';
 import api from '../services/api';
-import GoogleLoginButton from '../components/GoogleLoginButton'; // Assuming you have a GoogleLoginButton component
+import GoogleLoginButton from '../components/GoogleLoginButton';
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
@@ -45,7 +45,10 @@ const Login: React.FC = () => {
       if (result.success) {
         console.log('Login successful, redirecting to:', result.redirectTo);
         setLoading(false);
-        navigate(result.redirectTo);
+        // Fix TS2769 by ensuring navigate is only called with a defined string
+        if (result.redirectTo) {
+          navigate(result.redirectTo);
+        }
       } else {
         console.error('Login failed:', result.message);
         setError(result.message);
@@ -247,7 +250,8 @@ const Login: React.FC = () => {
             <div className="flex-grow border-t border-gray-300"></div>
           </div>
 
-          { <GoogleLoginButton /> }
+          {/* <GoogleLoginButton /> */}
+          <GoogleLoginButton />
         </div>
       </div>
 

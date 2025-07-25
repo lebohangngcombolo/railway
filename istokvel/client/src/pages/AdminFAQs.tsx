@@ -6,17 +6,34 @@ import api from "../services/api"; // <-- add this import
 import { useNavigate } from "react-router-dom"; // Add this import
 import Modal from "react-modal"; // npm install react-modal
 
+// 1. Define FAQ and notification types
+interface FAQ {
+  id: number;
+  question: string;
+  category: string;
+  is_published: boolean;
+  status?: string;
+}
+interface Notification {
+  id: number;
+  title: string;
+  message: string;
+  created_at: string;
+}
+
 const STATUS_COLORS = {
   Published: "bg-green-100 text-green-800",
   Unpublished: "bg-gray-200 text-gray-600",
 };
 
 function AdminFAQs() {
-  const [faqs, setFaqs] = useState([]);
-  const [notifications, setNotifications] = useState([]);
+  // 2. Use these types for state
+  const [faqs, setFaqs] = useState<FAQ[]>([]);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("");
-  const [categories, setCategories] = useState([]);
+  // 1. Explicitly type categories state as string[]
+  const [categories, setCategories] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -43,17 +60,26 @@ function AdminFAQs() {
     const url = buildFaqsUrl();
     try {
       const res = await api.get(url);
-      setFaqs(res.data);
-      setCategories([...new Set(res.data.map(f => f.category))]);
-    } catch (err) {
-      if (err.response && (err.response.status === 401 || err.response.status === 403)) {
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-        navigate('/login');
-      } else if (err.response && err.response.status === 404) {
-        toast.error("FAQ endpoint not found. Please check your backend route.");
-      } else {
-        toast.error("Failed to load FAQs");
+      setFaqs(res.data as FAQ[]);
+      setCategories([...new Set((res.data as FAQ[]).map((f: FAQ) => String(f.category)))]);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        if (err.message === "Network Error") {
+          toast.error("Network error. Please check your internet connection.");
+        } else {
+          toast.error(`Failed to load FAQs: ${err.message}`);
+        }
+      } else if (typeof err === 'object' && err !== null && 'response' in err) {
+        const response = (err as any).response;
+        if (response && (response.status === 401 || response.status === 403)) {
+          localStorage.removeItem('token');
+          localStorage.removeItem('user');
+          navigate('/login');
+        } else if (response && response.status === 404) {
+          toast.error("FAQ endpoint not found. Please check your backend route.");
+        } else {
+          toast.error("Failed to load FAQs");
+        }
       }
     }
     setLoading(false);
@@ -64,13 +90,22 @@ function AdminFAQs() {
     try {
       const res = await api.get("/api/admin/notifications");
       setNotifications(res.data.notifications || []);
-    } catch (err) {
-      if (err.response && (err.response.status === 401 || err.response.status === 403)) {
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-        navigate('/login');
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        if (err.message === "Network Error") {
+          toast.error("Network error. Please check your internet connection.");
+        } else {
+          toast.error(`Failed to load notifications: ${err.message}`);
+        }
+      } else if (typeof err === 'object' && err !== null && 'response' in err) {
+        const response = (err as any).response;
+        if (response && (response.status === 401 || response.status === 403)) {
+          localStorage.removeItem('token');
+          localStorage.removeItem('user');
+          navigate('/login');
+        }
+        // Optionally handle other errors
       }
-      // Optionally handle other errors
     }
   };
 
@@ -89,15 +124,18 @@ function AdminFAQs() {
     setForm({ question: "", answer: "", category: "", is_published: true });
   };
 
-  const handleFormChange = (e) => {
-    const { name, value, type, checked } = e.target;
+  // 3. Add explicit types for function parameters
+  type InputEvent = React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>;
+  const handleChange = (e: InputEvent) => {
+    const { name, value, type } = e.target;
+    const checked = (e.target as HTMLInputElement).checked;
     setForm((prev) => ({
       ...prev,
       [name]: type === "checkbox" ? checked : value,
     }));
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
     try {
@@ -105,8 +143,16 @@ function AdminFAQs() {
       toast.success("FAQ created!");
       handleCloseModal();
       fetchFaqs(); // refresh list
-    } catch (err) {
-      toast.error("Failed to create FAQ");
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        if (err.message === "Network Error") {
+          toast.error("Network error. Please check your internet connection.");
+        } else {
+          toast.error(`Failed to create FAQ: ${err.message}`);
+        }
+      } else {
+        toast.error("Failed to create FAQ");
+      }
     }
     setSubmitting(false);
   };
@@ -170,7 +216,7 @@ function AdminFAQs() {
                     <td colSpan={3} className="p-8 text-center text-gray-400">No FAQs found.</td>
                   </tr>
                 ) : (
-                  faqs.map(faq => (
+                  faqs.map((faq: FAQ) => (
                     <tr key={faq.id} className="border-b hover:bg-gray-50 transition">
                       <td className="p-3">{faq.question}</td>
                       <td className="p-3">{faq.category}</td>
@@ -222,7 +268,7 @@ function AdminFAQs() {
             <input
               name="question"
               value={form.question}
-              onChange={handleFormChange}
+              onChange={handleChange}
               className="border rounded px-3 py-2 w-full"
               required
             />
@@ -232,7 +278,7 @@ function AdminFAQs() {
             <textarea
               name="answer"
               value={form.answer}
-              onChange={handleFormChange}
+              onChange={handleChange}
               className="border rounded px-3 py-2 w-full"
               required
             />
@@ -242,7 +288,7 @@ function AdminFAQs() {
             <input
               name="category"
               value={form.category}
-              onChange={handleFormChange}
+              onChange={handleChange}
               className="border rounded px-3 py-2 w-full"
             />
           </div>
@@ -251,7 +297,7 @@ function AdminFAQs() {
               type="checkbox"
               name="is_published"
               checked={form.is_published}
-              onChange={handleFormChange}
+              onChange={handleChange}
               id="is_published"
             />
             <label htmlFor="is_published">Published</label>

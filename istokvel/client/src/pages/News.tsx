@@ -19,8 +19,18 @@ const itemVariants = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: 'easeOut' } },
 };
 
+interface NewsArticle {
+  id: string;
+  title: string;
+  excerpt: string;
+  date: string;
+  author: string;
+  image: string;
+  link: string;
+}
+
 const News: React.FC = () => {
-  const [newsArticles, setNewsArticles] = useState([]);
+  const [newsArticles, setNewsArticles] = useState<NewsArticle[]>([]);
 
   useEffect(() => {
     const fetchNews = async () => {
@@ -69,21 +79,21 @@ const News: React.FC = () => {
               variants={itemVariants}
             >
               <img
-                src={article.image}
-                alt={article.title}
+                src={article.image || "/default-image.png"}
+                alt={article.title || "No title available"}
                 className="w-full h-48 object-cover"
               />
               <div className="p-6 flex flex-col flex-grow">
-                <h3 className="text-xl font-semibold text-blue-800 mb-3">{article.title}</h3>
-                <p className="text-gray-700 text-sm mb-4 flex-grow">{article.excerpt}</p>
+                <h3 className="text-xl font-semibold text-blue-800 mb-3">{article.title || "Untitled"}</h3>
+                <p className="text-gray-700 text-sm mb-4 flex-grow">{article.excerpt || "No excerpt available"}</p>
                 <div className="flex items-center text-gray-500 text-xs mt-auto">
                   <Calendar size={14} className="mr-1" />
-                  <span>{article.date}</span>
+                  <span>{article.date || "Unknown date"}</span>
                   <User size={14} className="ml-4 mr-1" />
-                  <span>{article.author}</span>
+                  <span>{article.author || "Unknown author"}</span>
                 </div>
                 <a
-                  href={article.link}
+                  href={article.link || "#"}
                   className="mt-4 inline-block text-blue-600 hover:underline text-sm font-medium"
                 >
                   Read More

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 // Import RotateCcw icon
-import { Menu, X, User, LogOut, Bell, Search, ChevronDown, ChevronLeft, ChevronRight, Home, DollarSign, Activity, BarChart2, Briefcase, Calendar, RotateCcw } from 'lucide-react';
+import { RotateCcw } from 'lucide-react';
 
 const BOT_ICON_URL = "https://png.pngtree.com/png-clipart/20230401/original/pngtree-smart-chatbot-cartoon-clipart-png-image_9015126.png";
 

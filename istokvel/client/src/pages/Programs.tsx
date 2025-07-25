@@ -6,11 +6,7 @@ import {
   Cross, 
   Briefcase, 
   TrendingUp,
-  ArrowRight,
-  Users,
-  Calendar,
-  DollarSign,
-  Activity
+  ArrowRight
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
@@ -118,14 +114,6 @@ const Programs: React.FC = () => {
     }
   ];
 
-  const horizontalNavItems = [
-    { id: 'home', label: 'Home', path: '/' },
-    { id: 'programs', label: 'Programs', path: '/programs' },
-    { id: 'about', label: 'About Us', path: '/about' },
-    { id: 'news', label: 'News', path: '/news' },
-    { id: 'contact', label: 'Contact', path: '/contact' }
-  ];
-
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Navigation Bar */}
@@ -138,17 +126,38 @@ const Programs: React.FC = () => {
 
             {/* Desktop Navigation */}
             <div className="hidden md:flex space-x-8">
-              {horizontalNavItems.map((item) => (
-                <Link
-                  key={item.id}
-                  to={item.path}
-                  className={`text-gray-600 hover:text-blue-700 transition-colors duration-200 ${
-                    item.path === '/programs' ? 'font-semibold text-blue-600' : ''
-                  }`}
-                >
-                  {item.label}
-                </Link>
-              ))}
+              <Link
+                to="/programs"
+                className={`text-gray-600 hover:text-blue-700 transition-colors duration-200 ${
+                  window.location.pathname === '/programs' ? 'font-semibold text-blue-600' : ''
+                }`}
+              >
+                Programs
+              </Link>
+              <Link
+                to="/about"
+                className={`text-gray-600 hover:text-blue-700 transition-colors duration-200 ${
+                  window.location.pathname === '/about' ? 'font-semibold text-blue-600' : ''
+                }`}
+              >
+                About Us
+              </Link>
+              <Link
+                to="/news"
+                className={`text-gray-600 hover:text-blue-700 transition-colors duration-200 ${
+                  window.location.pathname === '/news' ? 'font-semibold text-blue-600' : ''
+                }`}
+              >
+                News
+              </Link>
+              <Link
+                to="/contact"
+                className={`text-gray-600 hover:text-blue-700 transition-colors duration-200 ${
+                  window.location.pathname === '/contact' ? 'font-semibold text-blue-600' : ''
+                }`}
+              >
+                Contact
+              </Link>
             </div>
 
             {/* Auth Buttons */}

@@ -1,9 +1,21 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
 
+interface Beneficiary {
+  id: string;
+  name: string;
+  relationship: string;
+  id_number: string;
+  email: string;
+  status: "Pending" | "Approved" | "Rejected";
+  id_doc_url?: string;
+  address_doc_url?: string;
+  relationship_doc_url?: string;
+}
+
 const BeneficiaryApprovals = () => {
-  const [beneficiaries, setBeneficiaries] = useState([]);
-  const [previewBeneficiary, setPreviewBeneficiary] = useState<{ url: string; label: string; beneficiaryId: string; docType: string } | null>(null);
+  const [beneficiaries, setBeneficiaries] = useState<Beneficiary[]>([]);
+  const [previewBeneficiary, setPreviewBeneficiary] = useState<Beneficiary | null>(null);
   const [docPreview, setDocPreview] = useState<{ url: string; label: string } | null>(null);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
@@ -28,6 +40,7 @@ const BeneficiaryApprovals = () => {
   );
 
   const handleApprove = async () => {
+    if (!previewBeneficiary) return;
     await fetch(`/api/admin/beneficiaries/${previewBeneficiary.id}/approve`, {
       method: "POST",
       headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
@@ -43,6 +56,7 @@ const BeneficiaryApprovals = () => {
   };
 
   const handleReject = async () => {
+    if (!previewBeneficiary) return;
     await fetch(`/api/admin/beneficiaries/${previewBeneficiary.id}/reject`, {
       method: "POST",
       headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
@@ -81,14 +95,14 @@ const BeneficiaryApprovals = () => {
       </div>
       <div className="overflow-x-auto">
         <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-[#f4f6fb]">
+          <thead className="bg-[#3B4CCA]">
             <tr>
-              <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Name</th>
-              <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Relationship</th>
-              <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase">ID Number</th>
-              <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Email</th>
-              <th className="px-4 py-3 text-center text-xs font-semibold text-gray-700 uppercase">Status</th>
-              <th className="px-4 py-3 text-center text-xs font-semibold text-gray-700 uppercase">Actions</th>
+              <th className="px-4 py-3 text-left text-xs font-semibold text-white uppercase">Name</th>
+              <th className="px-4 py-3 text-left text-xs font-semibold text-white uppercase">Relationship</th>
+              <th className="px-4 py-3 text-left text-xs font-semibold text-white uppercase">ID Number</th>
+              <th className="px-4 py-3 text-left text-xs font-semibold text-white uppercase">Email</th>
+              <th className="px-4 py-3 text-center text-xs font-semibold text-white uppercase">Status</th>
+              <th className="px-4 py-3 text-center text-xs font-semibold text-white uppercase">Actions</th>
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-100">
@@ -154,10 +168,10 @@ const BeneficiaryApprovals = () => {
                     🪪 ID Document
                     <button
                       className="ml-2 text-blue-600 underline"
-                      onClick={() => setDocPreview({ url: previewBeneficiary.id_doc_url, label: "ID Document" })}
+                      onClick={() => setDocPreview({ url: previewBeneficiary.id_doc_url || "", label: "ID Document" })}
                     >Preview</button>
                     <a
-                      href={previewBeneficiary.id_doc_url}
+                      href={previewBeneficiary.id_doc_url || ""}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="ml-2 text-blue-600 underline"
@@ -169,10 +183,10 @@ const BeneficiaryApprovals = () => {
                     🏠 Proof of Address
                     <button
                       className="ml-2 text-blue-600 underline"
-                      onClick={() => setDocPreview({ url: previewBeneficiary.address_doc_url, label: "Proof of Address" })}
+                      onClick={() => setDocPreview({ url: previewBeneficiary.address_doc_url || "", label: "Proof of Address" })}
                     >Preview</button>
                     <a
-                      href={previewBeneficiary.address_doc_url}
+                      href={previewBeneficiary.address_doc_url || ""}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="ml-2 text-blue-600 underline"
@@ -184,10 +198,10 @@ const BeneficiaryApprovals = () => {
                     📄 Proof of Relationship
                     <button
                       className="ml-2 text-blue-600 underline"
-                      onClick={() => setDocPreview({ url: previewBeneficiary.relationship_doc_url, label: "Proof of Relationship" })}
+                      onClick={() => setDocPreview({ url: previewBeneficiary.relationship_doc_url || "", label: "Proof of Relationship" })}
                     >Preview</button>
                     <a
-                      href={previewBeneficiary.relationship_doc_url}
+                      href={previewBeneficiary.relationship_doc_url || ""}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="ml-2 text-blue-600 underline"
@@ -220,10 +234,10 @@ const BeneficiaryApprovals = () => {
                   onClick={() => setDocPreview(null)}
                 >✕</button>
                 <h4 className="font-semibold mb-2">{docPreview.label}</h4>
-                {docPreview.url.endsWith('.pdf') ? (
-                  <iframe src={docPreview.url} title="Preview" className="w-full h-64" />
+                {docPreview.url?.endsWith('.pdf') ? (
+                  <iframe src={docPreview.url || ""} title="Preview" className="w-full h-64" />
                 ) : (
-                  <img src={docPreview.url} alt="Preview" className="max-w-full max-h-64 rounded" />
+                  <img src={docPreview.url || ""} alt="Preview" className="max-w-full max-h-64 rounded" />
                 )}
               </div>
             </div>

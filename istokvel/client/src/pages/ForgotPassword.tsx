@@ -55,7 +55,13 @@ const ForgotPassword: React.FC = () => {
 
   return (
     <div className="h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 relative overflow-hidden">
-      <PageTransition show={showTransition} />
+      <PageTransition show={showTransition}>
+        {/* Put the content you want to transition here */}
+        {/* Example: */}
+        <div>
+          {/* Existing content of your ForgotPassword page */}
+        </div>
+      </PageTransition>
 
       {/* Animated Coins Background */}
       <div className="absolute inset-0 overflow-hidden">

@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getCurrentUser, logout as authLogout, isAuthenticated } from '../utils/auth';
+import { logout as authLogout, isAuthenticated } from '../utils/auth';
 import { authAPI } from '../services/api';
 
 interface User {

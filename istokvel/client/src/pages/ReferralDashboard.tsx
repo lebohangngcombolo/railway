@@ -1,7 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { referralAPI } from '../services/api';
 import { toast } from 'react-hot-toast';
-import { Gift, Copy, Share2, Users, Star } from 'lucide-react';
 
 interface Reward {
   key: string;

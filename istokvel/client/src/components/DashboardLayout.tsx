@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Outlet, useLocation, useNavigate, Link } from 'react-router-dom';
+import { useState, useEffect, useRef } from 'react';
+import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { 
   User, 
   CreditCard,
@@ -7,7 +7,6 @@ import {
   Users,
   Gift,
   Briefcase,
-  ShoppingBag,
   Menu,
   Bell,
   DollarSign
@@ -43,20 +42,6 @@ const topNavItems = [
   { label: 'Learning', path: '/learning' },
 ];
 
-const SEEN_NOTIFICATIONS_KEY = 'seenNotificationIds';
-
-const getSeenNotificationIds = () => {
-  try {
-    return new Set(JSON.parse(localStorage.getItem(SEEN_NOTIFICATIONS_KEY) || '[]'));
-  } catch {
-    return new Set();
-  }
-};
-
-const setSeenNotificationIds = (ids: Set<number>) => {
-  localStorage.setItem(SEEN_NOTIFICATIONS_KEY, JSON.stringify(Array.from(ids)));
-};
-
 const DashboardLayout = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -84,8 +69,8 @@ const DashboardLayout = () => {
       if (res.ok) {
         const data = await res.json();
         const newNotifications = Array.isArray(data) ? data : (data.notifications || []);
-        const newIds = new Set(newNotifications.map(n => n.id));
-        const unread = newNotifications.filter(n => !n.is_read);
+        const newIds = new Set<number>(newNotifications.map((n: { id: number }) => n.id));
+        const unread = newNotifications.filter((n: { is_read: boolean }) => !n.is_read);
 
         // --- Play sound only once per session if there are unread notifications on first load ---
         if (!soundPlayedThisSession.current) {
@@ -98,7 +83,7 @@ const DashboardLayout = () => {
         } else {
           // On subsequent polls, play sound for truly new notifications
           const prevIds = prevNotificationIds.current;
-          const isNew = newNotifications.some(n => !prevIds.has(n.id));
+          const isNew = newNotifications.some((n: { id: number }) => !prevIds.has(n.id));
           if (prevIds.size && isNew) {
             const audio = new Audio(notificationSound);
             audio.volume = 0.5;
@@ -290,7 +275,6 @@ const DashboardLayout = () => {
         >
           <nav className="flex-1 space-y-2">
             {sidebarItems.map((item) => {
-              const isActive = location.pathname.startsWith(item.path);
               return (
                 <button
                   key={item.label}

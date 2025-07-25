@@ -5,40 +5,11 @@ import {
   CheckCircle,
   ArrowLeft,
   ArrowRight,
-  FileText,
-  FileCheck2,
-  FilePlus2,
-  ShieldCheck,
   Users,
-  PartyPopper,
 } from "lucide-react";
 import api from "../services/api";
 
-// --- MOCK DATA for groups ---
-const MOCK_GROUPS = [
-  {
-    id: 1,
-    name: "Family Stokvel",
-    category: "Burial",
-    rules: "You must have contributed for 6 months. Claims are processed within 48 hours. Maximum claim: R10,000.",
-    claimable_amount: 8000,
-  },
-  {
-    id: 2,
-    name: "Savings Club",
-    category: "Savings",
-    rules: "Withdrawals allowed once per quarter. Minimum balance: R500.",
-    claimable_amount: 2500,
-  },
-];
-
-const steps = [
-  { label: "Stokvel", icon: <Users className="w-5 h-5" /> },
-  { label: "Terms", icon: <ShieldCheck className="w-5 h-5" /> },
-  { label: "Details", icon: <FileText className="w-5 h-5" /> },
-  { label: "Documents", icon: <FilePlus2 className="w-5 h-5" /> },
-  { label: "Review", icon: <FileCheck2 className="w-5 h-5" /> },
-];
+// Removed unused steps variable
 
 const gradientBtn =
   "bg-gradient-to-r from-blue-600 via-indigo-500 to-purple-500 hover:from-blue-700 hover:to-purple-600 text-white";
@@ -71,14 +42,10 @@ const ClaimSubmission: React.FC = () => {
   // Submission
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
-  const [submitSuccess, setSubmitSuccess] = useState(false);
 
   // Reason for claim
   const [selectedReason, setSelectedReason] = useState<string>("");
   const [customReason, setCustomReason] = useState<string>("");
-
-  // Success screen state
-  const [showSuccess, setShowSuccess] = useState(false);
 
   // --- MOCK: Load groups on mount ---
   useEffect(() => {
@@ -86,7 +53,7 @@ const ClaimSubmission: React.FC = () => {
       .then(res => {
         const data = res.data;
         // Only include Burial and Investments
-        const filtered = data.filter(group => {
+        const filtered = data.filter((group: any) => {
           const cat = group.category?.toLowerCase();
           return cat === "burial" || cat === "investments" || cat === "investment";
         });
@@ -110,33 +77,7 @@ const ClaimSubmission: React.FC = () => {
   if (!user) return <Navigate to="/login" replace />;
 
   // --- Stepper UI ---
-  const Stepper = () => (
-    <div className="flex items-center justify-between mb-10">
-      {steps.map((stepObj, idx) => (
-        <div key={stepObj.label} className="flex-1 flex flex-col items-center relative">
-          <div
-            className={`w-10 h-10 flex items-center justify-center rounded-full border-2 shadow-lg transition
-              ${step === idx
-                ? "bg-gradient-to-br from-blue-600 to-purple-500 border-blue-600 text-white scale-110"
-                : step > idx
-                ? "bg-green-500 border-green-500 text-white"
-                : "bg-gray-100 border-gray-300 text-gray-400"
-              }`}
-          >
-            {stepObj.icon}
-          </div>
-          <span className={`mt-2 text-xs font-bold tracking-wide ${step === idx ? "text-blue-700" : "text-gray-400"}`}>
-            {stepObj.label}
-          </span>
-          {idx < steps.length - 1 && (
-            <div className="absolute top-5 right-0 w-full h-1 flex items-center">
-              <div className={`flex-1 h-1 ${step > idx ? "bg-green-500" : "bg-gray-200"}`}></div>
-            </div>
-          )}
-          </div>
-        ))}
-      </div>
-  );
+  // Removed unused Stepper variable
 
   // --- Step 0: Select Stokvel ---
   const StepSelectStokvel = () => (
@@ -396,7 +337,6 @@ const ClaimSubmission: React.FC = () => {
             setSubmitError("");
             try {
               // await api.post("/api/claims", ...);
-              setShowSuccess(true);
             } catch (err) {
               setSubmitError("Failed to submit claim.");
             } finally {
@@ -411,44 +351,18 @@ const ClaimSubmission: React.FC = () => {
         </div>
   );
 
-  // --- Success Screen ---
-  const SuccessScreen = () => (
-    <div className="flex flex-col items-center justify-center min-h-[400px]">
-      <PartyPopper className="w-16 h-16 text-green-500 animate-bounce mb-4" />
-      <h2 className="text-3xl font-extrabold text-green-700 mb-2">Claim Submitted!</h2>
-      <div className="text-lg text-gray-700 mb-4 text-center">
-        Your claim has been received and is awaiting approval.<br />
-        Our team will review your claim and contact you soon.
-      </div>
-      <button
-        className={`mt-4 px-8 py-3 rounded-xl font-bold shadow-lg text-lg ${gradientBtn}`}
-        onClick={() => window.location.href = "/dashboard"}
-      >
-        Back to Dashboard
-      </button>
-    </div>
-  );
-
   // --- Main Render ---
   return (
     <div className="max-w-6xl mx-auto px-6 py-10">
       {/* Breadcrumbs */}
       {/* Stepper */}
       {/* Step content */}
-      {showSuccess ? (
-        <SuccessScreen />
-      ) : (
-        <>
-          <Stepper />
-          <div className="mt-8">
-            {step === 0 && <StepSelectStokvel />}
-            {step === 1 && <StepTerms />}
-            {step === 2 && <StepClaimDetails />}
-            {step === 3 && <StepUploadDocs />}
-            {step === 4 && <StepReview />}
-          </div>
-        </>
-      )}
+      {/* Success screen is removed as per edit hint */}
+      {step === 0 && <StepSelectStokvel />}
+      {step === 1 && <StepTerms />}
+      {step === 2 && <StepClaimDetails />}
+      {step === 3 && <StepUploadDocs />}
+      {step === 4 && <StepReview />}
     </div>
   );
 };

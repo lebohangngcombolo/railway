@@ -1,6 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
 import { X, Lock, CheckCircle } from "lucide-react";
-import { toast } from 'react-toastify';
 
 interface AddCardModalProps {
   open: boolean;
@@ -63,20 +62,6 @@ const AddCardModal: React.FC<AddCardModalProps> = ({ open, onClose, onSave }) =>
         onClose();
       }, 1200);
     }
-  };
-
-  const handleDelete = async () => {
-    try {
-      await deleteCardApi(cardId);
-      toast.success('Successfully deleted');
-      // ...other logic, like closing the modal...
-    } catch (error) {
-      toast.error('Failed to delete card');
-    }
-  };
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
   };
 
   useEffect(() => {

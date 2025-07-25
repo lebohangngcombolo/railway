@@ -7,17 +7,11 @@ import {
   XCircle,
   Plus,
   Search,
-  Users,
-  Calendar,
-  DollarSign,
   Tag,
-  CreditCard,
   ChevronDown,
   ChevronRight,
-  Filter,
   Clock,
   User,
-  Building2,
   PiggyBank,
   Heart,
   TrendingUp,
@@ -27,11 +21,8 @@ import {
   X,
   AlertCircle,
   MessageSquare,
-  Archive,
-  RotateCcw,
-  History,
-  RefreshCw,
   ChevronLeft,
+  Archive,
 } from "lucide-react";
 import { adminAPI } from "../../services/api";
 import { toast } from "react-hot-toast";
@@ -47,149 +38,25 @@ const CATEGORIES = [
 
 const TIERS = ["Bronze", "Silver", "Gold", "Platinum"];
 
-// Request Status Management
-const REQUEST_STATUS = {
-  PENDING: "pending",
-  APPROVED: "approved", 
-  REJECTED: "rejected",
-  ARCHIVED: "archived"
-};
-
 // Status Badge Component
 const StatusBadge = ({ status }: { status: string }) => {
   const config = {
-    pending: { 
-      color: "bg-amber-50 text-amber-700 border-amber-200", 
-      icon: Clock,
-      bgColor: "bg-amber-100"
-    },
-    approved: { 
-      color: "bg-emerald-50 text-emerald-700 border-emerald-200", 
-      icon: CheckCircle,
-      bgColor: "bg-emerald-100"
-    },
-    rejected: { 
-      color: "bg-rose-50 text-rose-700 border-rose-200", 
-      icon: XCircle,
-      bgColor: "bg-rose-100"
-    },
-    archived: { 
-      color: "bg-gray-50 text-gray-700 border-gray-200", 
-      icon: Archive,
-      bgColor: "bg-gray-100"
-    },
+    pending: { color: "bg-amber-50 text-amber-700 border-amber-200", icon: Clock },
+    approved: { color: "bg-emerald-50 text-emerald-700 border-emerald-200", icon: CheckCircle },
+    rejected: { color: "bg-rose-50 text-rose-700 border-rose-200", icon: XCircle },
+    archived: { color: "bg-gray-50 text-gray-700 border-gray-200", icon: Archive },
   };
-  
-  const { color, icon: Icon, bgColor } = config[status as keyof typeof config] || config.pending;
-  
+  const badge = config[status as keyof typeof config] || config.pending;
+  const Icon = badge.icon;
   return (
-    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border ${color}`}>
+    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border ${badge.color}`}>
       <Icon size={12} />
       <span className="capitalize">{status}</span>
     </span>
   );
 };
 
-// Archive Management Modal
-const ArchiveModal = ({ isOpen, onClose, onRestore, onDelete, request }: {
-  isOpen: boolean;
-  onClose: () => void;
-  onRestore: (id: number) => void;
-  onDelete: (id: number) => void;
-  request: any;
-}) => {
-  const [loading, setLoading] = useState(false);
-
-  const handleRestore = async () => {
-    setLoading(true);
-    try {
-      await onRestore(request.id);
-      toast.success("Request restored successfully!");
-      onClose();
-    } catch (error) {
-      toast.error("Failed to restore request");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleDelete = async () => {
-    if (window.confirm("Are you sure you want to permanently delete this request?")) {
-      setLoading(true);
-      try {
-        await onDelete(request.id);
-        toast.success("Request deleted permanently!");
-        onClose();
-      } catch (error) {
-        toast.error("Failed to delete request");
-      } finally {
-        setLoading(false);
-      }
-    }
-  };
-
-  if (!isOpen || !request) return null;
-
-  return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg max-w-md w-full">
-        <div className="p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-gray-900">Archive Management</h3>
-            <button onClick={onClose} className="p-1 hover:bg-gray-100 rounded transition">
-              <X size={20} />
-            </button>
-          </div>
-          
-          <div className="space-y-4">
-            <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-              <div className="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center">
-                <User size={20} className="text-indigo-600" />
-              </div>
-              <div>
-                <div className="font-medium text-gray-900">{request.user}</div>
-                <div className="text-sm text-gray-500">{request.groupName} • {request.tier}</div>
-              </div>
-            </div>
-
-            <div className="text-sm text-gray-600">
-              <span className="font-medium">Rejected on:</span> {new Date(request.rejectedAt || request.date).toLocaleDateString()}
-            </div>
-
-            {request.reason && (
-              <div className="text-sm text-gray-600">
-                <span className="font-medium">Reason:</span> {request.reason}
-              </div>
-            )}
-
-            <div className="flex gap-2 pt-4">
-              <button
-                onClick={handleRestore}
-                disabled={loading}
-                className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-indigo-50 text-indigo-700 rounded-md font-medium hover:bg-indigo-100 transition disabled:opacity-50"
-              >
-                {loading ? (
-                  <RefreshCw size={16} className="animate-spin" />
-                ) : (
-                  <RotateCcw size={16} />
-                )}
-                Restore Request
-              </button>
-  <button
-                onClick={handleDelete}
-                disabled={loading}
-                className="flex items-center justify-center gap-2 px-4 py-2 bg-rose-50 text-rose-700 rounded-md font-medium hover:bg-rose-100 transition disabled:opacity-50"
-              >
-                <Trash2 size={16} />
-  </button>
-            </div>
-      </div>
-      </div>
-      </div>
-    </div>
-  );
-};
-
+// ArchiveModal removed as it was unused
 // Modal Component for View Details
 const ViewDetailsModal = ({ request, isOpen, onClose }: {
   request: any;
@@ -990,18 +857,18 @@ const StokvelManagement: React.FC = () => {
 
       {showCreateModal && (
         <CreateStokvelGroup
-          onSubmit={async (data) => {
+          onSubmit={async (formData) => {
             try {
               await adminAPI.createGroup({
-                ...data,
-                contributionAmount: data.contributionAmount || data.contribution_amount,
-                maxMembers: data.maxMembers || data.max_members,
+                ...formData,
+                contributionAmount: formData.contributionAmount || formData.contribution_amount,
+                maxMembers: formData.maxMembers || formData.max_members,
               });
               // Refresh groups
               const res = await adminAPI.getGroups();
-              const data = res.data.groups || res.data;
+              const groupData = res.data.groups || res.data;
               setGroups(
-                data.map((g: any) => ({
+                groupData.map((g: any) => ({
                   id: g.id,
                   name: g.name,
                   category: g.category,

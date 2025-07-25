@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import api from "../services/api";
-import { Loader2, CheckCircle, XCircle, Clock, Eye, ChevronDown } from "lucide-react";
+import { Loader2, XCircle, Eye } from "lucide-react";
 
 const statusColors: Record<string, string> = {
   pending: "bg-yellow-100 text-yellow-800",
@@ -108,7 +108,7 @@ const AdminPayouts: React.FC = () => {
               </tr>
             </thead>
             <tbody>
-              {filtered.map((r, idx) => (
+              {filtered.map((r, _) => (
                 <tr key={r.id} className="border-t hover:bg-blue-50 transition">
                   <td className="p-3 font-semibold">{r.user_name}</td>
                   <td className="p-3">{r.user_email}</td>

@@ -389,11 +389,11 @@ const Signup: React.FC = () => {
         result = await verifyPhoneCode(userPhoneForVerification, verificationCode);
       }
 
-      if (result.success) {
+      if (result && result.success) {
         toast.success('Account verified successfully!');
         navigate('/login');
       } else {
-        setOtpError(result.message);
+        setOtpError(result?.message || 'Verification failed. Please try again.');
       }
     } catch (error: any) {
       setOtpError(error.response?.data?.error || 'Verification failed. Please try again.');
@@ -417,7 +417,7 @@ const Signup: React.FC = () => {
         result = await resendSmsVerificationCode(userPhoneForVerification);
       }
       
-      if (result.success) {
+      if (result && result.success) {
         // Show success message
         setResendMessage('New verification code sent successfully!');
         setOtp(['', '', '', '', '', '']);
@@ -441,8 +441,8 @@ const Signup: React.FC = () => {
         
         toast.success('New verification code sent!');
       } else {
-        toast.error(result.message);
-        setOtpError(result.message);
+        toast.error(result?.message || 'Failed to resend code. Please try again.');
+        setOtpError(result?.message || 'Failed to resend code. Please try again.');
       }
     } catch (error: any) {
       const errorMessage = error.response?.data?.error || error.response?.data?.message || 'Failed to resend code. Please try again.';
@@ -808,7 +808,7 @@ const Signup: React.FC = () => {
                   </div>
                 </div>
 
-                { <GoogleLoginButton /> }
+                <GoogleLoginButton />
               </form>
             )}
           </div>

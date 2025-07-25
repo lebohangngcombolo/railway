@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate, useLocation, Outlet, Link } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import LandingPage from './pages/LandingPage';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
@@ -12,8 +12,6 @@ import Marketplace from './pages/Marketplace';
 import UserProfile from './pages/UserProfile';
 import UserManagement from './pages/UserManagement';
 import StokvelManagement from './components/admin/StokvelManagement';
-import { isAuthenticated, getCurrentUser } from './utils/auth';
-import { useAuth } from './hooks/useAuth';
 import ChatBot from './components/ChatBot';
 import ForgotPassword from './pages/ForgotPassword';
 import Programs from './pages/Programs';
@@ -48,67 +46,17 @@ import AdminReports from './pages/AdminReports';
 import AdminTeam from './pages/AdminTeam';
 import Learning from './pages/Learning';
 import AdminPayouts from './pages/AdminPayouts';
-
-const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
-  const location = useLocation();
-  
-  if (!isAuthenticated()) {
-    // Redirect to login but save the attempted url
-    return <Navigate to="/login" state={{ from: location }} replace />;
-  }
-  
-  // SECURITY FIX: Additional check for verification status
-  const user = getCurrentUser();
-  if (!user || !user.is_verified) {
-    return <Navigate to="/login" state={{ from: location }} replace />;
-  }
-  
-  return <>{children}</>;
-};
-
-// Protected route for regular users
-const UserRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const isAuth = isAuthenticated();
-  const user = getCurrentUser();
-  
-  if (!isAuth) {
-    return <Navigate to="/login" replace />;
-  }
-  
-  // If user is admin, redirect to admin dashboard
-  if (user?.role === 'admin') {
-    return <Navigate to="/admin" replace />;
-  }
-  
-  return <>{children}</>;
-};
-
-// Protected route for admin users
-const AdminRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const isAuth = isAuthenticated();
-  const user = getCurrentUser();
-  
-  if (!isAuth) {
-    return <Navigate to="/login" replace />;
-  }
-  
-  // If user is not admin, redirect to user dashboard
-  if (user?.role !== 'admin') {
-    return <Navigate to="/dashboard" replace />;
-  }
-  
-  return <>{children}</>;
-};
+import AdminRoute from './components/AdminRoute';
 
 const App: React.FC = () => {
-  const [user, setUser] = useState(null);
+  // Removed unused user state
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const userData = await getCurrentUserService();
-        setUser(userData);
+        await getCurrentUserService();
+        // setUser(userData); // This line was removed as per the edit hint
       } catch (error) {
         console.error('Error fetching user:', error);
       } finally {

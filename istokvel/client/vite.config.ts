@@ -8,7 +8,22 @@ export default defineConfig({
     port: 5173,
     host: true,
     proxy: {
-      '/api': 'http://127.0.0.1:5001',
+      '/api': 'https://server-batm.onrender.com',
     }
+  },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          // Example: Split vendor code
+          vendor: ['react', 'react-dom', 'react-router-dom'],
+          // Example: Split out admin pages
+          admin: ['./src/pages/AdminDashboard.tsx', './src/pages/AdminTeam.tsx'],
+        }
+      }
+    }
+  },
+  define: {
+    'import.meta.env.VITE_API_URL': JSON.stringify('https://server-batm.onrender.com')
   }
 })

@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { Star, Gift, Users, ShieldCheck, TrendingUp, CheckCircle, ArrowLeft, Calendar } from "lucide-react";
+import { useParams } from "react-router-dom";
+import { Gift, Users, TrendingUp, CheckCircle, Calendar } from "lucide-react";
 import { Link } from "react-router-dom";
-import DashboardLayout from "../components/DashboardLayout";
 import { useAuth } from "../hooks/useAuth";
 // Import or copy your tierDetails, getAmountsInRange, getFeatures, getBenefits helpers here
 
@@ -146,25 +145,10 @@ function getAmountsInRange(range: string) {
   }
   return amounts;
 }
-function getFeatures(amount: number, tier: string) {
-  // ...same as before...
-  return [
-    { icon: <Users className="w-5 h-5 text-blue-500" />, label: "Group Savings" },
-    { icon: <TrendingUp className="w-5 h-5 text-green-500" />, label: "Flexible Deposits" },
-    { icon: <ShieldCheck className="w-5 h-5 text-yellow-500" />, label: "Safe & Secure" },
-  ];
-}
-function getBenefits(amount: number, tier: string) {
-  // ...same as before...
-  return [
-    { icon: <CheckCircle className="w-5 h-5 text-green-500" />, label: "Basic support" },
-    { icon: <Gift className="w-5 h-5 text-pink-500" />, label: "Welcome bonus" },
-  ];
-}
+// Removed unused getFeatures and getBenefits functions
 
 const TierDetails: React.FC = () => {
   const { category, tier } = useParams();
-  const navigate = useNavigate();
   const { user } = useAuth();
 
   function capitalize(str: string) {
@@ -200,10 +184,10 @@ const TierDetails: React.FC = () => {
     })
       .then(res => res.json())
       .then(data => {
-        const pending = data.some(req =>
+        const pending = data.some((req: any) =>
           req.category === category &&
           req.tier === tier &&
-          req.amount === selectedAmount &&
+          req.amount === Number(selectedAmount) &&
           req.status === "pending"
         );
         setIsPending(pending);
@@ -233,10 +217,10 @@ const TierDetails: React.FC = () => {
         })
           .then(res => res.json())
           .then(data => {
-            const pending = data.some(req =>
+            const pending = data.some((req: any) =>
               req.category === category &&
               req.tier === tier &&
-              req.amount === selectedAmount &&
+              req.amount === Number(selectedAmount) &&
               req.status === "pending"
             );
             setIsPending(pending);
@@ -270,16 +254,16 @@ const TierDetails: React.FC = () => {
           <span>/</span>
           <Link to="/dashboard/stokvel-groups" className="hover:underline text-blue-600">Stokvel Groups</Link>
           <span>/</span>
-          <span className="text-gray-700 font-semibold">{capitalize(tier)} {capitalize(category)}</span>
+          <span className="text-gray-700 font-semibold">{capitalize(tier || "")} {capitalize(category || "")}</span>
         </div>
 
         {/* Hero Section */}
         <div className="bg-blue-50 rounded-2xl p-8 flex flex-col md:flex-row items-center gap-8 mb-8">
           <div className="w-32 h-32 rounded-full flex items-center justify-center text-5xl font-bold shadow-lg bg-white text-blue-600 mb-4 md:mb-0">
-            {capitalize(tier)[0]}
+            {capitalize(tier || "")[0]}
           </div>
           <div>
-            <h1 className="text-3xl font-bold mb-2">{capitalize(tier)} {capitalize(category)} Stokvel</h1>
+            <h1 className="text-3xl font-bold mb-2">{capitalize(tier || "")} {capitalize(category || "")} Stokvel</h1>
             <p className="text-lg text-gray-600 mb-4">{details.description}</p>
             <button
               className="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold shadow hover:bg-blue-700 transition mt-4 disabled:opacity-50"
@@ -301,7 +285,7 @@ const TierDetails: React.FC = () => {
               value={selectedAmount}
               onChange={e => setSelectedAmount(Number(e.target.value))}
             >
-              {amounts.map(amt => (
+              {amounts.map((amt: number) => (
                 <option key={amt} value={amt}>
                   R{amt}
                 </option>
@@ -416,7 +400,7 @@ const TierDetails: React.FC = () => {
             <div className="bg-blue-50 rounded-xl px-8 py-6 mb-6 flex flex-col gap-4">
               <div className="flex flex-row justify-between">
                 <span className="font-medium text-gray-600">Full Name:</span>
-                <span className="font-semibold text-blue-900">{user?.full_name || user?.name || "-"}</span>
+                <span className="font-semibold text-blue-900">{user?.name || "-"}</span>
               </div>
               <div className="flex flex-row justify-between">
                 <span className="font-medium text-gray-600">Email:</span>
@@ -424,11 +408,11 @@ const TierDetails: React.FC = () => {
               </div>
               <div className="flex flex-row justify-between">
                 <span className="font-medium text-gray-600">Category:</span>
-                <span className="font-semibold text-blue-900">{capitalize(category)}</span>
+                <span className="font-semibold text-blue-900">{capitalize(category || "")}</span>
               </div>
               <div className="flex flex-row justify-between">
                 <span className="font-medium text-gray-600">Tier:</span>
-                <span className="font-semibold text-blue-900">{capitalize(tier)}</span>
+                <span className="font-semibold text-blue-900">{capitalize(tier || "")}</span>
               </div>
               <div className="flex flex-row justify-between">
                 <span className="font-medium text-gray-600">Amount:</span>
@@ -443,7 +427,7 @@ const TierDetails: React.FC = () => {
           <button
               className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-xl transition mb-8 mx-auto block"
               onClick={() => {
-                handleJoin(selectedAmount);
+                handleJoin(Number(selectedAmount));
                 setShowModal(false);
                 setShowSuccess(true);
 
@@ -456,10 +440,10 @@ const TierDetails: React.FC = () => {
                 })
                   .then(res => res.json())
                   .then(data => {
-                    const pending = data.some(req =>
+                    const pending = data.some((req: any) =>
                       req.category === category &&
                       req.tier === tier &&
-                      req.amount === selectedAmount &&
+                      req.amount === Number(selectedAmount) &&
                       req.status === "pending"
                     );
                     setIsPending(pending);
@@ -499,88 +483,5 @@ const TierDetails: React.FC = () => {
     </div>
   );
 };
-
-const LearnMoreStokvel = () => (
-  <div className="max-w-4xl mx-auto py-10 px-4">
-    {/* Hero Section */}
-    <div className="bg-blue-50 rounded-2xl p-8 flex flex-col md:flex-row items-center gap-8 mb-8">
-      <img src="/src/assets/realistic.png" alt="Stokvel Group" className="w-40 h-40 object-contain" />
-      <div>
-        <h1 className="text-3xl font-bold mb-2">Platinum Savings Stokvel</h1>
-        <p className="text-lg text-gray-600 mb-4">
-          Maximize your group's savings with high interest, flexible access, and premium support.
-        </p>
-        <Link to="/dashboard/stokvel-groups/join">
-          <button className="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold shadow hover:bg-blue-700 transition">
-            Join Now
-          </button>
-        </Link>
-      </div>
-    </div>
-
-    {/* Key Benefits */}
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-      <div className="bg-white rounded-xl shadow p-6 flex flex-col items-center">
-        <DollarSign className="w-12 h-12 mb-2 text-blue-600" />
-        <h3 className="font-semibold text-lg mb-1">High Interest</h3>
-        <p className="text-gray-500 text-center">Earn up to 5% p.a. on your group savings.</p>
-      </div>
-      <div className="bg-white rounded-xl shadow p-6 flex flex-col items-center">
-        <CheckCircle className="w-12 h-12 mb-2 text-green-600" />
-        <h3 className="font-semibold text-lg mb-1">Flexible Access</h3>
-        <p className="text-gray-500 text-center">Withdraw funds anytime, no penalties.</p>
-      </div>
-      <div className="bg-white rounded-xl shadow p-6 flex flex-col items-center">
-        <Users className="w-12 h-12 mb-2 text-purple-600" />
-        <h3 className="font-semibold text-lg mb-1">24/7 Support</h3>
-        <p className="text-gray-500 text-center">Get premium support for your group.</p>
-      </div>
-    </div>
-
-    {/* Quick Facts */}
-    <div className="bg-blue-100 rounded-xl p-6 flex flex-col md:flex-row justify-between items-center mb-8">
-      <div>
-        <div className="font-semibold text-gray-700">Minimum Contribution</div>
-        <div className="text-xl font-bold">R2,000</div>
-      </div>
-      <div>
-        <div className="font-semibold text-gray-700">Interest Rate</div>
-        <div className="text-xl font-bold">5.0% p.a.</div>
-      </div>
-      <div>
-        <div className="font-semibold text-gray-700">Access</div>
-        <div className="text-xl font-bold">Anytime</div>
-      </div>
-    </div>
-
-    {/* How it Works */}
-    <div className="mb-8">
-      <h2 className="text-2xl font-bold mb-4">How it Works</h2>
-      <ol className="list-decimal list-inside space-y-2 text-gray-600">
-        <li>Invite your group members to join the stokvel.</li>
-        <li>Set your monthly contribution and savings goal.</li>
-        <li>Track your progress and earn interest together.</li>
-        <li>Withdraw funds anytime or set payout dates.</li>
-      </ol>
-    </div>
-
-    {/* FAQ */}
-    <div>
-      <h2 className="text-2xl font-bold mb-4">Frequently Asked Questions</h2>
-      <div className="mb-2">
-        <div className="font-semibold">Who can join?</div>
-        <div className="text-gray-600">Anyone with a valid South African ID and a group of at least 3 members.</div>
-      </div>
-      <div className="mb-2">
-        <div className="font-semibold">Are there any fees?</div>
-        <div className="text-gray-600">No monthly fees. Only a small withdrawal fee applies.</div>
-      </div>
-      <div className="mb-2">
-        <div className="font-semibold">How do I get started?</div>
-        <div className="text-gray-600">Click "Join Now" above or contact our support team for help.</div>
-      </div>
-    </div>
-  </div>
-);
 
 export default TierDetails;

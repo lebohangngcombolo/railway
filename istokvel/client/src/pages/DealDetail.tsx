@@ -49,7 +49,12 @@ const DealDetail: React.FC = () => {
         <div className="mb-4">
           <h2 className="font-semibold mb-1">How to Claim/Book:</h2>
           <ul className="list-disc list-inside text-gray-600">
-            <li>Contact the partner: <a href={deal.link} className="text-blue-600 underline" target="_blank" rel="noopener noreferrer">{deal.partner}</a></li>
+            <li>
+              Contact the partner:{" "}
+              <span className="text-gray-400 underline cursor-not-allowed" title="Coming soon">
+                {deal.partner}
+              </span>
+            </li>
             <li>Show your stokvel membership or use your group code at checkout.</li>
             <li>Follow any instructions provided by the partner.</li>
           </ul>
